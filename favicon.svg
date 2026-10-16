@@ -1,7 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="16" fill="#17181a"/>
-  <rect x="17" y="24" width="30" height="20" rx="5" fill="#5262e8"/>
-  <rect x="21" y="13" width="22" height="17" rx="3" fill="#ffffff"/>
-  <rect x="22" y="38" width="20" height="13" rx="2" fill="#ffffff"/>
-  <circle cx="41" cy="30" r="2" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <title>Mini Printer</title>
+  <rect x="3" y="10" width="26" height="17" rx="4" fill="#2b4cde"/>
+  <path d="M10 12V3h12v9" fill="#fbf9f2" stroke="#2b4cde" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M8 20h16" stroke="#fbf9f2" stroke-width="2" stroke-linecap="round"/>
+  <path d="M10 20h12v9H10z" fill="#fbf9f2" stroke="#2b4cde" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M13 25h6" stroke="#2b4cde" stroke-width="2" stroke-linecap="round"/>
 </svg>
