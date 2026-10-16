@@ -58,5 +58,21 @@ test('initial sticky state is hidden and only the mobile header CTA is suppresse
   assert.match(html, /<aside class="mobile-order is-hidden"/);
   assert.match(html, /class="button button--small header-order" href="#order"/);
   assert.match(css, /@media \(max-width: 680px\)[\s\S]*?\.nav, \.header-order { display: none; }/);
-  assert.match(css, /html { scroll-padding-top: 80px; }/);
+  assert.match(css, /html { scroll-padding-top: 16px; }/);
+});
+
+test('mobile header remains in document flow and desktop header remains sticky', () => {
+  assert.match(css, /\.header { position: sticky; top: 0;/);
+  const mobile = css.slice(css.indexOf('@media (max-width: 680px)'));
+  assert.match(mobile, /\.header { position: static; top: auto; z-index: auto; }/);
+  assert.match(mobile, /html { scroll-padding-top: 16px; }/);
+  assert.doesNotMatch(mobile, /scroll-padding-top: 80px/);
+});
+
+test('footer has brand first, then credit and copyright on a wrapping baseline row', () => {
+  const footer = /<footer class="footer">([\s\S]*?)<\/footer>/.exec(html)[1];
+  assert.match(footer, /<span class="footer-brand">Mini Printer<\/span>\s*<div class="footer-meta">\s*<p class="footer-credit">by BeBetter Development<\/p>\s*<p class="footer-copyright">© 2026<\/p>\s*<\/div>/);
+  assert.match(css, /\.footer-meta { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;/);
+  assert.match(css, /\.footer \.footer-copyright { margin-inline-start: auto; white-space: nowrap; }/);
+  assert.doesNotMatch(css, /\.footer-credit { flex-basis: 100%/);
 });

@@ -131,7 +131,6 @@ export function initStickyOrder({ document: doc = document, window: win = window
   const hero = doc.querySelector('.hero__actions a[href="#order"]');
   const section = doc.getElementById('order-section');
   const target = doc.getElementById('order');
-  const header = doc.querySelector('.header');
   if (!bar) return;
   bar.classList.toggle('is-hidden', true); // Also hidden in HTML: no first-paint duplicate.
   // Fail closed if visibility cannot be determined; Hero/header CTAs still work.
@@ -153,13 +152,12 @@ export function initStickyOrder({ document: doc = document, window: win = window
     const keyboardLikely = baselineHeight - height > Math.max(150, baselineHeight * .25);
     if (keyboardLikely || (viewport?.scale ?? 1) > 1.05) return false;
     baselineHeight = Math.max(baselineHeight, win.innerHeight, height);
-    const top = header?.getBoundingClientRect().bottom ?? 0;
     const heroRect = hero.getBoundingClientRect();
     const orderRect = section.getBoundingClientRect();
     // Spatial buffers plus delayed reveal prevent boundary flicker. A Hero CTA
     // below the fold is not considered "passed", even if it is not visible yet.
-    const heroPassed = heroRect.bottom <= top - 16;
-    const nearOrder = orderRect.top <= height + 128 && orderRect.bottom >= top - 32;
+    const heroPassed = heroRect.bottom <= -16;
+    const nearOrder = orderRect.top <= height + 128 && orderRect.bottom >= -32;
     return heroPassed && !nearOrder;
   };
   const hide = () => {
@@ -183,7 +181,7 @@ export function initStickyOrder({ document: doc = document, window: win = window
   const observer = new win.IntersectionObserver(schedule, { rootMargin: '0px 0px 128px 0px', threshold: 0 });
   observer.observe(hero);
   observer.observe(section);
-  // Geometry check on scroll also accounts for the sticky header's occluded area.
+  // Geometry checks use the viewport edge, with no mobile header occlusion offset.
   win.addEventListener('scroll', schedule, { passive: true });
   win.addEventListener('resize', schedule);
   win.addEventListener('orientationchange', () => { baselineHeight = win.innerHeight; schedule(); });
