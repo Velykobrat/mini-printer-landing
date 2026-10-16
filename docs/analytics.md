@@ -1,5 +1,7 @@
 # GA4 integration and verification
 
+Оновлення після PR #8: [Marketing Attribution & Conversion Funnel](marketing-attribution.md) описує consent-gated sessionStorage, безпечний UTM-контракт, native campaign_* на існуючих подіях і налаштування воронки. Нижче — базова реалізація PR #8; її 112 тестів входять до розширеного suite (129 тестів для attribution PR).
+
 Status: implementation for review, not a production verification report. No production deployment, environment changes or GA4 account changes have been performed. Browser/visual QA has not been performed: local browser access was unavailable and Vercel preview requires access not granted to this session. Automated tests use DOM/Google/Telegram doubles, not the real Google library.
 
 Validation: `node --test tests/*.test.mjs` — **112 passed, 0 failed** (91 existing + 21 added); `node scripts/check.mjs` — passed. The commands run the same entry points as npm test/check; npm's Windows cmd launcher is unavailable in this environment. Protected API/shared files and product photographs match the audited GitHub blobs byte-for-byte.

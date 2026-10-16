@@ -1,8 +1,9 @@
 import { PRODUCT } from './shared/product.js';
 import { ANALYTICS } from './analytics-config.js';
+import { campaignParameters } from './attribution.js';
 
 // Only allowlisted parameters leave this module. Never forward form/URL values.
-export function createAnalytics({ enabled = false, hasConsent = () => false, send = () => {} } = {}) {
+export function createAnalytics({ enabled = false, hasConsent = () => false, send = () => {}, getAttribution = () => ({}) } = {}) {
   const sent = new Set();
   return function track(event, details = {}) {
     try {
@@ -17,6 +18,9 @@ export function createAnalytics({ enabled = false, hasConsent = () => false, sen
         payload = { product: 'mini_printer', currency: PRODUCT.currency, value: PRODUCT.price };
         if (event !== 'generate_lead') payload.items = [{ item_id: PRODUCT.id, item_name: PRODUCT.name, price: PRODUCT.price, quantity: 1 }];
       } else return false;
+      if (['order_click', 'begin_checkout', 'generate_lead'].includes(event)) {
+        try { Object.assign(payload, campaignParameters(getAttribution())); } catch { /* Attribution is optional. */ }
+      }
       if (send(event, payload) === false) return false;
       if (key) sent.add(key);
       return true;
@@ -26,7 +30,7 @@ export function createAnalytics({ enabled = false, hasConsent = () => false, sen
 
 const clients = new WeakMap();
 export function createGoogleTag({ window: win = window, document: doc = document, config = ANALYTICS,
-  hasConsent = () => false } = {}) {
+  hasConsent = () => false, getAttribution = () => ({}) } = {}) {
   if (clients.has(win)) return clients.get(win);
   let active = false;
   let ready = false;
@@ -46,7 +50,9 @@ export function createGoogleTag({ window: win = window, document: doc = document
   const flush = () => {
     if (!ready || !allowed()) return;
     if (!pageViewed) {
-      command('event', 'page_view', { page_location: config.pageLocation, page_title: 'Mini Printer', page_referrer: '' });
+      let campaign = {};
+      try { campaign = campaignParameters(getAttribution()); } catch { /* Optional attribution cannot stop pageview. */ }
+      command('event', 'page_view', { page_location: config.pageLocation, page_title: 'Mini Printer', page_referrer: '', ...campaign });
       pageViewed = true;
     }
     for (const [event, payload] of queue) command('event', event, payload);
@@ -74,6 +80,10 @@ export function createGoogleTag({ window: win = window, document: doc = document
         allow_google_signals: false, allow_ad_personalization_signals: false,
         cookie_expires: 15552000, cookie_update: false,
         page_location: config.pageLocation, page_referrer: '', page_title: 'Mini Printer',
+        // Do not let raw URL UTM values bypass validation. Consented events
+        // supply approved campaign fields at the higher event scope instead.
+        campaign_source: '', campaign_medium: '', campaign_name: '',
+        campaign_content: '', campaign_term: '', campaign_id: '',
         ...(config.debug ? { debug_mode: true } : {}) });
       script = doc.createElement('script');
       script.async = true;
