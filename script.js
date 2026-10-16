@@ -2,6 +2,7 @@ import { validateOrder } from './shared/validation.js';
 import { ANALYTICS } from './analytics-config.js';
 import { createAnalytics, createGoogleTag } from './analytics.js';
 import { createConsent, initConsentUI } from './consent.js';
+import { createAttribution } from './attribution.js';
 
 export function initOrderForm({ document: doc = document, fetchImpl = globalThis.fetch,
   track = () => {}, timeoutMs = 12000 } = {}) {
@@ -228,11 +229,14 @@ if (typeof document !== 'undefined') {
   let track = () => false;
   try {
     const consent = createConsent({ onChange: granted => {
-      if (granted) { tag.enable(); track('view_item'); } else tag.disable();
+      if (granted) { attribution.get(); tag.enable(); track('view_item'); }
+      else { tag.disable(); attribution.clear(); }
     } });
-    const tag = createGoogleTag({ hasConsent: () => consent.hasConsent() });
+    const attribution = createAttribution({ hasConsent: () => consent.hasConsent() });
+    const tag = createGoogleTag({ hasConsent: () => consent.hasConsent(), getAttribution: () => attribution.get() });
     track = createAnalytics({ enabled: ANALYTICS.enabled,
-      hasConsent: () => consent.hasConsent(), send: (event, payload) => tag.send(event, payload) });
+      hasConsent: () => consent.hasConsent(), getAttribution: () => attribution.get(),
+      send: (event, payload) => tag.send(event, payload) });
     initConsentUI({ consent });
     consent.start();
   } catch { /* Storage, DOM or Google failures must never prevent ordering. */ }

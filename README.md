@@ -63,6 +63,8 @@ npm run check
 
 ## GA4 і згода
 
+UTM та воронка: [docs/marketing-attribution.md](docs/marketing-attribution.md). Після згоди sessionStorage зберігає перший перевірений UTM-перехід вкладки; native campaign_* додаються до наявних funnel events. Довільні текстові значення не приймаються: для майбутніх Instagram/Facebook/TikTok/Google Ads кампаній використовуйте нейтральний формат кодів і безпечні приклади з документації. Відкликання очищує attribution. Нових conversion/session подій, Ads-функцій чи змін дизайну немає.
+
 GA4 ID: `G-WHL8RKEGFJ`. Google tag завантажується лише після явної згоди або збереженого чинного дозволу (180 днів), лише на `mini-printer-landing.vercel.app`. До згоди й після відмови немає Google tag / collect запитів. При недоступному localStorage — без аналітики. Вибір можна змінити через «Налаштування cookies» у footer; відкликання негайно встановлює Google opt-out і видаляє доступні first-party GA cookies. Замовлення не залежить від аналітики.
 
 Події: `order_click` (реальне CTA, location header/hero/sticky_bar), `begin_checkout` (раз на спробу взаємодії), `generate_lead` (лише після нового підтвердженого успіху API), а також збережений `view_item` і один `page_view` після згоди. Ціна імпортується зі спільної конфігурації. Імена/телефони/значення полів у payload не передаються; `purchase` немає.
