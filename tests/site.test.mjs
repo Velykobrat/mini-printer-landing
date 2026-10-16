@@ -6,7 +6,7 @@ import { PRODUCT, formatPrice } from '../shared/product.js';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const html = read('index.html'); const css = read('styles.css');
 test('static price slots agree with server config and Product schema', () => {
-  const slots = [...html.matchAll(/data-price="current"[^>]*>([^<]+)</g)]; assert.equal(slots.length, 6);
+  const slots = [...html.matchAll(/data-price="current"[^>]*>([^<]+)</g)]; assert.equal(slots.length, 4);
   for (const [, value] of slots) assert.equal(value, formatPrice(PRODUCT.price));
   const schema = JSON.parse(/<script type="application\/ld\+json">([^<]+)<\/script>/.exec(html)[1]);
   assert.equal(schema.offers.price, PRODUCT.price); assert.equal(schema.offers.priceCurrency, PRODUCT.currency);
@@ -42,4 +42,21 @@ test('design tokens and responsive safeguards are retained (static, not browser 
   assert.match(css, /safe-area-inset-bottom/); assert.match(css, /\.mobile-order\.is-hidden/);
   assert.equal((css.match(/:root\s*{/g) || []).length, 1);
   assert.doesNotMatch(css, /\.gallery|\.feature--large|\.eyebrow--light|\.section--media/);
+});
+
+test('order section has one current price and a price-free heading/submit label', () => {
+  const section = /<section class="order-section"[\s\S]*?<\/section>/.exec(html)[0];
+  assert.equal((section.match(/data-price="current"/g) || []).length, 1);
+  assert.equal((section.match(/data-price="reference"/g) || []).length, 1);
+  assert.match(section, /<h2 id="order-title">Замовити Mini Printer<\/h2>/);
+  const button = /<button[^>]+type="submit"[^>]*>([\s\S]*?)<\/button>/.exec(section)[1].trim();
+  assert.equal(button, 'Надіслати заявку');
+  assert.match(section, /class="order-form" id="order" tabindex="-1" aria-labelledby="order-form-heading"/);
+  assert.match(section, /id="order-note">Залиште контакти — ми зв'яжемося з вами для підтвердження деталей./);
+});
+test('initial sticky state is hidden and only the mobile header CTA is suppressed', () => {
+  assert.match(html, /<aside class="mobile-order is-hidden"/);
+  assert.match(html, /class="button button--small header-order" href="#order"/);
+  assert.match(css, /@media \(max-width: 680px\)[\s\S]*?\.nav, \.header-order { display: none; }/);
+  assert.match(css, /html { scroll-padding-top: 80px; }/);
 });
