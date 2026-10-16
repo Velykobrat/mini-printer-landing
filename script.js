@@ -1,4 +1,3 @@
-import { PRODUCT, formatPrice } from './shared/product.js';
 import { validateOrder } from './shared/validation.js';
 import { ANALYTICS } from './analytics-config.js';
 import { createAnalytics } from './analytics.js';
@@ -11,7 +10,7 @@ export function initOrderForm({ document: doc = document, fetchImpl = globalThis
   const button = form.querySelector('button[type="submit"]');
   const fields = { name: form.elements.namedItem('name'), phone: form.elements.namedItem('phone') };
   const safeTrack = (event) => { try { track(event); } catch { /* Tracking cannot affect orders. */ } };
-  const idleLabel = `Замовити за ${formatPrice(PRODUCT.price)}`;
+  const idleLabel = 'Надіслати заявку';
   let inFlight = false;
   let lastAccepted = null; // Tab-local duplicate guard, not distributed idempotency.
   form.noValidate = true; // Native constraints still work when JavaScript is unavailable.
@@ -56,7 +55,7 @@ export function initOrderForm({ document: doc = document, fetchImpl = globalThis
     }
     inFlight = true;
     button.disabled = true;
-    button.textContent = 'Надсилаємо…';
+    button.textContent = 'Надсилаємо заявку…';
     form.setAttribute('aria-busy', 'true');
     for (const field of Object.values(fields)) field.readOnly = true;
     setStatus('Передаємо заявку…');
@@ -101,23 +100,99 @@ export function initOrderForm({ document: doc = document, fetchImpl = globalThis
   });
 }
 
-export function initStickyOrder({ document: doc = document, window: win = window } = {}) {
-  const bar = doc.querySelector('.mobile-order');
-  const order = doc.getElementById('order');
-  if (!bar || !order) return;
-  const hide = (hidden) => {
-    // Do not remove a focused link while a keyboard user is using it.
-    if (hidden && bar.contains(doc.activeElement)) return;
-    bar.classList.toggle('is-hidden', hidden);
+// Both mouse/keyboard CTAs and direct #order links target the actual form card.
+export function initOrderNavigation({ document: doc = document, window: win = window } = {}) {
+  const target = doc.getElementById('order');
+  if (!target) return;
+  const scroll = () => {
+    doc.querySelector('.mobile-order')?.classList.toggle('is-hidden', true);
+    // Focus a non-editable container: accessible arrival without opening a keyboard
+    // or firing begin_checkout before the visitor interacts with a field.
+    target.focus({ preventScroll: true });
+    const reduceMotion = win.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? true;
+    target.scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'start', inline: 'nearest' });
   };
-  if ('IntersectionObserver' in win) {
-    new win.IntersectionObserver(([entry]) => hide(entry.isIntersecting),
-      { threshold: 0, rootMargin: '0px 0px 96px 0px' }).observe(order);
-  } else {
-    // Older browsers: omit the optional floating control rather than obscure the form.
-    hide(true);
+  for (const link of doc.querySelectorAll('a[href="#order"]')) {
+    link.addEventListener('click', (event) => {
+      if (event.defaultPrevented || (event.button ?? 0) !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      if (win.location.hash !== '#order') win.history.pushState(null, '', '#order');
+      scroll(); // Repeated clicks realign the form, even when the hash is unchanged.
+    });
   }
-  doc.addEventListener('focusin', (event) => { if (order.contains(event.target)) hide(true); });
+  const scrollForHash = () => { if (win.location.hash === '#order') scroll(); };
+  win.addEventListener('hashchange', scrollForHash);
+  if (doc.readyState === 'complete') scrollForHash();
+  else win.addEventListener('load', scrollForHash, { once: true });
+}
+
+export function initStickyOrder({ document: doc = document, window: win = window, showDelayMs = 180 } = {}) {
+  const bar = doc.querySelector('.mobile-order');
+  const hero = doc.querySelector('.hero__actions a[href="#order"]');
+  const section = doc.getElementById('order-section');
+  const target = doc.getElementById('order');
+  const header = doc.querySelector('.header');
+  if (!bar) return;
+  bar.classList.toggle('is-hidden', true); // Also hidden in HTML: no first-paint duplicate.
+  // Fail closed if visibility cannot be determined; Hero/header CTAs still work.
+  if (!hero || !section || !target || !('IntersectionObserver' in win)) return;
+  const mobile = win.matchMedia?.('(max-width: 680px)');
+  const delay = win.setTimeout?.bind(win) ?? setTimeout;
+  const cancelDelay = win.clearTimeout?.bind(win) ?? clearTimeout;
+  let showTimer = null;
+  let frame = null;
+  let baselineHeight = win.innerHeight;
+  const focusedField = () => section.contains(doc.activeElement) &&
+    !!doc.activeElement?.matches('input, textarea, select, [contenteditable="true"]');
+  const canShow = () => {
+    if (!(mobile?.matches ?? win.innerWidth <= 680) || focusedField()) return false;
+    const viewport = win.visualViewport;
+    const height = viewport?.height ?? win.innerHeight;
+    // Keep the largest recent unoccluded height: covers visualViewport keyboards
+    // and browsers that resize the layout viewport. Address-bar changes are smaller.
+    const keyboardLikely = baselineHeight - height > Math.max(150, baselineHeight * .25);
+    if (keyboardLikely || (viewport?.scale ?? 1) > 1.05) return false;
+    baselineHeight = Math.max(baselineHeight, win.innerHeight, height);
+    const top = header?.getBoundingClientRect().bottom ?? 0;
+    const heroRect = hero.getBoundingClientRect();
+    const orderRect = section.getBoundingClientRect();
+    // Spatial buffers plus delayed reveal prevent boundary flicker. A Hero CTA
+    // below the fold is not considered "passed", even if it is not visible yet.
+    const heroPassed = heroRect.bottom <= top - 16;
+    const nearOrder = orderRect.top <= height + 128 && orderRect.bottom >= top - 32;
+    return heroPassed && !nearOrder;
+  };
+  const hide = () => {
+    if (showTimer !== null) { cancelDelay(showTimer); showTimer = null; }
+    if (bar.contains(doc.activeElement)) target.focus({ preventScroll: true });
+    bar.classList.toggle('is-hidden', true);
+  };
+  const update = () => {
+    if (!canShow()) { hide(); return; }
+    if (!bar.classList.contains('is-hidden') || showTimer !== null) return;
+    showTimer = delay(() => {
+      showTimer = null;
+      if (canShow()) bar.classList.toggle('is-hidden', false);
+    }, showDelayMs);
+  };
+  const schedule = () => {
+    if (frame !== null) return;
+    if (win.requestAnimationFrame) frame = win.requestAnimationFrame(() => { frame = null; update(); });
+    else update();
+  };
+  const observer = new win.IntersectionObserver(schedule, { rootMargin: '0px 0px 128px 0px', threshold: 0 });
+  observer.observe(hero);
+  observer.observe(section);
+  // Geometry check on scroll also accounts for the sticky header's occluded area.
+  win.addEventListener('scroll', schedule, { passive: true });
+  win.addEventListener('resize', schedule);
+  win.addEventListener('orientationchange', () => { baselineHeight = win.innerHeight; schedule(); });
+  mobile?.addEventListener?.('change', schedule);
+  win.visualViewport?.addEventListener('resize', schedule);
+  win.visualViewport?.addEventListener('scroll', schedule, { passive: true });
+  doc.addEventListener('focusin', update);
+  doc.addEventListener('focusout', () => { delay(schedule, 0); });
+  update();
 }
 
 if (typeof document !== 'undefined') {
@@ -130,5 +205,6 @@ if (typeof document !== 'undefined') {
   track('view_item');
   window.addEventListener('mini-printer:analytics-consent', () => track('view_item'));
   initOrderForm({ track });
+  initOrderNavigation();
   initStickyOrder();
 }
