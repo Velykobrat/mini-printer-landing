@@ -1,4 +1,8 @@
-# QA — Mini Printer v2.1.0
+# QA — Mini Printer v2.2.0
+
+Актуальний локальний QA Premium Experience: [release-v2.2.0.md](release-v2.2.0.md). Попередній звіт v2.1.0 нижче збережено як історичний.
+
+## QA v2.1.0
 
 Актуальний звіт: [release-v2.1.0.md](release-v2.1.0.md). `npm test`: 136/136; `npm run check` і `git diff --check`: PASS. Окремий `npm run qa:browser` пройшов на локальному Chrome, 320–1920 px; sticky 375/390 px, форма з mock 503/200, production-demo gate на локально підміненому hostname. Production/WAF/GA4/Telegram, screen reader і фізична мобільна клавіатура не перевірялися.
 

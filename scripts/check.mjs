@@ -23,7 +23,7 @@ for (const [, url] of html.matchAll(/(?:src|href)="(?:\.\/)?([^"#:]+)"/g)) {
 }
 for (const file of files(root).filter(file => /\.(?:js|mjs)$/.test(file))) {
   const text = fs.readFileSync(file, 'utf8');
-  for (const [, target] of text.matchAll(/(?:from\s*|import\s*)['"](\.[^'"]+)['"]/g)) assert(fs.existsSync(path.resolve(path.dirname(file), target)), `Missing module ${target}`);
+  for (const [, target] of text.matchAll(/(?:from\s*|import\s*(?:\(\s*)?)['"](\.[^'"]+)['"]/g)) assert(fs.existsSync(path.resolve(path.dirname(file), target)), `Missing module ${target}`);
 }
 assert.equal((html.match(/<h1\b/g) || []).length, 1);
 assert.match(html, /<html lang="uk">/);

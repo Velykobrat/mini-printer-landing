@@ -1,8 +1,8 @@
-# Mini Printer v2.1.0
+# Mini Printer v2.2.0 — Premium Experience
 
 Україномовний лендінг портативного термопринтера. Збережено візуальний напрям Pocket Studio, HTML/CSS/vanilla JavaScript і Vercel Node.js Function із Telegram Bot API. Немає frontend-фреймворку, бази даних, сторонніх npm-залежностей або обов’язкового build-кроку.
 
-Реліз **v2.1.0** підготовлено на базі `main` / `1b6c3cf`, включно зі злитими PR #8 (GA4/consent) і #9 (UTM/funnel). Версія в `package.json` — `2.1.0`. Склад релізу, діагностика sticky-панелі та межі перевірки: [release-v2.1.0.md](docs/release-v2.1.0.md).
+**v2.2.0 — Premium Experience**, затверджено до релізу 16.10.2026. База — стабільна v2.1.0 / `94b5212`, версія пакета — `2.2.0`. Публікація — релізний коміт і анотований Git tag `v2.2.0`; фактичний статус deployment перевіряється окремо. Зміни й QA: [release-v2.2.0.md](docs/release-v2.2.0.md), коротко — [CHANGELOG.md](CHANGELOG.md). Історія v2.1.0: [release-v2.1.0.md](docs/release-v2.1.0.md).
 
 ## Локальний запуск
 
@@ -122,3 +122,13 @@ CSS очищено від старих gallery/variant selectors та накла
 3. Інакше задайте `PLAYWRIGHT_MODULE` як абсолютний шлях до встановленого `playwright/index.mjs`. За потреби задайте `BROWSER_EXECUTABLE` як шлях до Chrome; `QA_BASE_URL` за замовчуванням `http://127.0.0.1:4173`, дозволені лише localhost-адреси.
 
 Сценарій перевіряє desktop/mobile, sticky на 375/390 px, форму з mock 503/200, відгуки, FAQ, video preload/play/seek та відсутність JS errors. Production hostname для перевірки приховування demo підмінено локальними файлами; реальний deployment не відкривається. API заявки перехоплено: реальних Telegram-повідомлень немає. Для sticky тест прокручує за **фактичну CTA**, а не лише до сусідньої секції.
+
+## Premium Experience v2.2.0
+
+- CSS motion tokens узгоджують переходи; CTA змінюють колір і стан натискання без зміщення. Hover застосовується лише за `(hover: hover) and (pointer: fine)`.
+- Поля мають короткі переходи рамки/фону, помітний focus і error; loading та результати використовують наявні aria-busy, disabled і status classes. Payload та повідомлення не змінені.
+- Уточнені H3, відступи споріднених карток та стани текстових посилань. Hover-ефектів для інформаційних карток немає.
+- FAQ залишається native details/summary: тільки fade відкритої відповіді 140 мс, без анімації висоти й JS-перехоплення.
+- `experience.js` асинхронно підключається після основних функцій. Чотири другорядні заголовки отримують одноразовий fade 320 мс із translateY(8px); до JS й до IntersectionObserver контент повністю видимий. При reduced motion спостереження не запускається або припиняється, активні ефекти скасовуються.
+- Hero, sticky-пороги, медіа, контент, ціни, API, GA4/UTM/consent, SEO та CSP збережені. Stagger, анімація Hero, анімація sticky-панелі й scroll-jacking відсутні.
+- `npm run qa:browser` додатково перевіряє hover/active без руху, стани форми, reveal once, reduced motion (також зміну під час сесії), відмову motion-модуля, no-JS на 320/390/1440 і touch-емуляцію. Firefox/WebKit та фізичні мобільні пристрої ще не перевірені.

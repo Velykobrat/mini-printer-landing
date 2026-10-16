@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { verifyPremiumExperience } from './premium-qa.mjs';
 
 const moduleName = process.env.PLAYWRIGHT_MODULE || 'playwright';
 const { chromium } = await import(path.isAbsolute(moduleName) ? pathToFileURL(moduleName).href : moduleName);
@@ -168,6 +169,7 @@ try {
   assert.equal(await production.locator('#reviews').isVisible(), false);
   assert.equal(await production.locator('#reviews-grid article').count(), 0);
   results.productionDemoHidden = true;
+  results.premium = await verifyPremiumExperience({ browser, baseURL });
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({ ...results, runtimeErrors: errors }, null, 2));
 } finally { await browser.close(); }

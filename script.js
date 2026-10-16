@@ -246,4 +246,6 @@ if (typeof document !== 'undefined') {
   const syncOffset = initAnchorOffsets();
   initOrderNavigation({ syncOffset, track });
   initStickyOrder();
+  import('./experience.js').then(({ initScrollReveal }) => initScrollReveal())
+    .catch(() => { /* Optional motion never affects the order flow. */ });
 }
