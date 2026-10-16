@@ -43,7 +43,16 @@ if (orderForm && formStatus) {
       formStatus.classList.add("form-status--error");
     } finally {
       submitButton.disabled = false;
-      submitButton.textContent = "Замовити";
+      submitButton.textContent = "Замовити за 800 грн";
     }
   });
 }
+
+const mobileOrder = document.querySelector('.mobile-order');
+const orderSection = document.getElementById('order');
+if (mobileOrder && orderSection && 'IntersectionObserver' in window) {
+  new IntersectionObserver(([entry]) => {
+    mobileOrder.classList.toggle('is-hidden', entry.isIntersecting);
+  }, { threshold: 0 }).observe(orderSection);
+}
+
