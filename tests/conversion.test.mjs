@@ -50,7 +50,7 @@ function setup({ mobile = true, reduceMotion = false, hash = '', readyState = 'c
   return { doc, win, media, hero, section, target, field, bar, stickyLink, headerLink, links, timers, observed, frame, settle, tick, hidden };
 }
 function sticky(options) { const ui = setup(options); initStickyOrder({ document: ui.doc, window: ui.win }); return ui; }
-const passHero = ui => { ui.hero.rect = { top: -20, bottom: 40 }; ui.tick(); };
+const passHero = ui => { ui.hero.rect = { top: -74, bottom: -20 }; ui.tick(); };
 
 test('sticky starts hidden, stays hidden while Hero CTA visible, shows after it passes', () => {
   const ui = sticky(); assert.deepEqual(ui.observed, [ui.hero, ui.section]); assert(ui.hidden()); ui.settle(); assert(ui.hidden());
@@ -60,7 +60,7 @@ test('CTA below the initial fold is not treated as already passed', () => {
   const ui = sticky(); ui.hero.rect = { top: 900, bottom: 954 }; ui.tick(); ui.settle(); assert(ui.hidden());
 });
 test('Hero boundary buffer and delayed reveal prevent flicker and stale timers', () => {
-  const ui = sticky(); ui.hero.rect = { top: -10, bottom: 55 }; ui.tick(); ui.settle(); assert(ui.hidden());
+  const ui = sticky(); ui.hero.rect = { top: -62, bottom: -8 }; ui.tick(); ui.settle(); assert(ui.hidden());
   passHero(ui); assert.equal(ui.timers.size, 1);
   ui.hero.rect = { top: 20, bottom: 74 }; ui.tick(); ui.settle(); assert(ui.hidden()); assert.equal(ui.timers.size, 0);
   passHero(ui); ui.settle(); assert.equal(ui.hidden(), false);
@@ -125,4 +125,9 @@ test('direct #order and subsequent hash changes target the same form card', () =
 test('initial deep link waits for layout load when the document is still loading', () => {
   const ui = setup({ hash: '#order', readyState: 'interactive' }); initOrderNavigation({ document: ui.doc, window: ui.win }); assert.equal(ui.target.scrolls, undefined);
   ui.win.fire('load'); assert.equal(ui.target.scrolls.length, 1); assert.equal(ui.doc.activeElement, ui.target);
+});
+
+test('a partially visible Hero CTA stays visible instead of being treated as behind a sticky header', () => {
+  const ui = sticky(); ui.hero.rect = { top: -14, bottom: 40 }; ui.tick(); ui.settle(); assert(ui.hidden());
+  passHero(ui); ui.settle(); assert.equal(ui.hidden(), false);
 });
