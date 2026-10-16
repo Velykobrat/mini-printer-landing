@@ -35,7 +35,7 @@ node scripts/sync-product.mjs
 - Налаштуйте незмінені server-only змінні `TELEGRAM_BOT_TOKEN` та `TELEGRAM_CHAT_ID` для потрібного середовища. Значень у репозиторії немає. Preview повинен використовувати окремий тестовий чат, якщо дозволена ручна інтеграційна перевірка.
 - Додайте правило WAF із [security.md](docs/security.md) **до приймання рекламного трафіку**. Конфігурація в репозиторії не активує обмеження запитів сама.
 - Перевірте фактичну canonical-адресу. Зараз збережено `https://mini-printer-landing.vercel.app/`; при зміні домену оновіть canonical, OG URL/image, Twitter image, robots і sitemap, потім запустіть `npm run sync:product`.
-- Security headers включають CSP із дозволом лише власних скриптів, Google Fonts і hash JSON-LD. У preview перевірте, чи він сумісний із Vercel Toolbar/зовнішніми інтеграціями. Не послаблюйте CSP до `unsafe-inline`; додайте лише потрібні джерела після перевірки.
+- Security headers включають CSP із дозволом власних скриптів, Google Fonts, hash JSON-LD і вузьких GA4 origins (завантаження лише після згоди). У preview перевірте, чи він сумісний із Vercel Toolbar/зовнішніми інтеграціями. Не послаблюйте CSP до `unsafe-inline`; додайте лише потрібні джерела після перевірки.
 - Ця гілка не зливається й не розгортається в production автоматично агентом. Git integration Vercel може створити preview після push; це залежить від наявних налаштувань проєкту.
 
 ## Заявка
@@ -61,20 +61,15 @@ npm run check
 
 Скрипт синхронізує `data-price`, Product JSON-LD та CSP hash. Результат треба закомітити. Це maintenance-крок при зміні ціни, а не frontend build. `check` виявляє розбіжності. Не редагуйте ціни в HTML окремо.
 
-## Analytics — вимкнено за замовчуванням
+## GA4 і згода
 
-Немає GA4 ID, Meta Pixel, зовнішнього tracker script або автоматичного збору подій. Підготовлено `view_item`, `begin_checkout`, `generate_lead`, кожен максимум один раз на завантаження сторінки. Payload формується лише з ID/назви товару, валюти, ціни й кількості; поля форми не передаються.
+GA4 ID: `G-WHL8RKEGFJ`. Google tag завантажується лише після явної згоди або збереженого чинного дозволу (180 днів), лише на `mini-printer-landing.vercel.app`. До згоди й після відмови немає Google tag / collect запитів. При недоступному localStorage — без аналітики. Вибір можна змінити через «Налаштування cookies» у footer; відкликання негайно встановлює Google opt-out і видаляє доступні first-party GA cookies. Замовлення не залежить від аналітики.
 
-Порядок підключення GA4:
+Події: `order_click` (реальне CTA, location header/hero/sticky_bar), `begin_checkout` (раз на спробу взаємодії), `generate_lead` (лише після нового підтвердженого успіху API), а також збережений `view_item` і один `page_view` після згоди. Ціна імпортується зі спільної конфігурації. Імена/телефони/значення полів у payload не передаються; `purchase` немає.
 
-1. Погодьте privacy/consent-процес і власний GA4 measurement ID. Не вставляйте ідентифікатори навмання.
-2. Реалізуйте consent UI. Google tag завантажуйте і конфігуруйте лише відповідно до вибраної стратегії згоди. GA4 Enhanced Measurement → Form interactions вимкніть, щоб не дублювати checkout/lead і не збирати непередбачені дані форми.
-3. Дозвольте потрібні Google tag/collect endpoints у CSP (`script-src`, `connect-src`, за потреби `img-src`) точними джерелами. Поточна сувора CSP їх блокує. Перевірте GA4 DebugView у контрольованому preview.
-4. У `analytics-config.js` встановіть `enabled: true`. Після згоди та готовності `window.gtag` встановіть `window.miniPrinterAnalyticsConsent = true` і викличте `window.dispatchEvent(new Event('mini-printer:analytics-consent'))`. Це відправить `view_item`, якщо він ще не відправлявся. `begin_checkout` спрацює при фокусі в полі; `generate_lead` — тільки після підтвердження сервера. Події до згоди не буферизуються й не відновлюються.
-5. При відкликанні згоди встановіть `window.miniPrinterAnalyticsConsent = false` і окремо зупиніть/деактивуйте vendor tracking через вашу consent-інтеграцію. Цей код не керує вже встановленим Google tag.
-6. Позначте `generate_lead` як key event у GA4. Не підключайте другий trigger на submit кнопки.
+**До ввімкнення в production:** вимкніть Enhanced Measurement для web stream, перевірте Google tag destinations та виконайте ручний Network/DebugView QA. Код не може змінити ці налаштування GA4. Повний опис payload, key event, CSP, обмежень та checklist — [docs/analytics.md](docs/analytics.md). Інформація для відвідувача — [privacy.html](privacy.html).
 
-Meta Pixel можна додати пізніше через ту саму consent-перевірку, окремий whitelist payload, відповідні CSP-дозволи й мапінг `generate_lead` → Lead. Не вмикайте advanced matching із телефонами/іменами без окремо погодженого рішення.
+Інтеграція підготовлена в PR; production collection не перевірено. Main, production env і Telegram API не змінювалися цією гілкою.
 
 ## Доступність, швидкість, SEO
 

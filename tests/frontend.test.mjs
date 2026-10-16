@@ -24,13 +24,35 @@ function setup(fetchImpl, options = {}) {
   return { form, button, status, name, phone, bot, errors, events };
 }
 const success = () => ({ ok: true, status: 200, json: async () => ({ success: true }) });
+test('checkout attempt is interaction-based and stable across field edits and a failed retry', async () => {
+  const sent = []; let requests = 0;
+  const track = createAnalytics({ enabled: true, hasConsent: () => true, send: (event, payload) => sent.push({ event, payload }) });
+  const ui = setup(async () => ++requests === 1 ? { ok: false, status: 503, json: async () => ({}) } : success(), { track });
+  assert.equal(sent.length, 0);
+  ui.form.emit('focusin', ui.name); ui.form.emit('input', ui.name); ui.form.emit('focusin', ui.phone);
+  await ui.form.emit('submit'); assert.deepEqual(sent.map(item => item.event), ['begin_checkout']);
+  await ui.form.emit('submit'); assert.deepEqual(sent.map(item => item.event), ['begin_checkout', 'generate_lead']);
+  ui.name.value = 'Інша людина'; ui.phone.value = '0991234567'; ui.form.emit('focusin', ui.name);
+  await ui.form.emit('submit');
+  assert.deepEqual(sent.map(item => item.event), ['begin_checkout', 'generate_lead', 'begin_checkout', 'generate_lead']);
+  ui.name.value = 'Інша людина'; ui.phone.value = '0991234567'; await ui.form.emit('submit');
+  assert.equal(sent.filter(item => item.event === 'generate_lead').length, 2); assert.equal(requests, 3);
+  assert.doesNotMatch(JSON.stringify(sent), /099|Інша|людина|Тестовий/);
+});
+test('double clicks during a pending API response produce exactly one lead after confirmation', async () => {
+  const sent = []; let resolve;
+  const track = createAnalytics({ enabled: true, hasConsent: () => true, send: event => sent.push(event) });
+  const ui = setup(() => new Promise(done => { resolve = done; }), { track });
+  const pending = ui.form.emit('submit'); await ui.form.emit('submit'); assert.deepEqual(sent, ['begin_checkout']);
+  resolve(success()); await pending; assert.deepEqual(sent, ['begin_checkout', 'generate_lead']);
+});
 test('frontend normalizes payload, accepts confirmed success and resets', async () => {
   let payload;
   const ui = setup(async (url, options) => { assert.equal(url, '/api/order'); assert.equal(options.method, 'POST'); payload = JSON.parse(options.body); return success(); });
   await ui.form.emit('submit');
   assert.equal(payload.phone, '+380991234567'); assert.equal(payload.price, undefined);
   assert.equal(ui.form.resets, 1); assert.equal(ui.button.disabled, false); assert.equal(ui.button.textContent, 'Надіслати заявку'); assert.equal(ui.name.readOnly, false);
-  assert.equal(ui.form.attributes['aria-busy'], undefined); assert.match(ui.status.className, /success/); assert.deepEqual(ui.events, ['generate_lead']);
+  assert.equal(ui.form.attributes['aria-busy'], undefined); assert.match(ui.status.className, /success/); assert.deepEqual(ui.events, ['begin_checkout', 'generate_lead']);
 });
 for (const [label, response] of [
   ['HTTP error', async () => ({ ok: false, status: 502, json: async () => ({ message: 'unsafe message' }) })],
@@ -75,7 +97,7 @@ test('analytics require configuration AND consent, deduplicate and contain no PI
   track('view_item'); assert.equal(events.length, 0); consent = true;
   for (const event of ['view_item', 'begin_checkout', 'generate_lead']) { track(event); track(event); }
   track('unknown'); assert.equal(events.length, 3);
-  for (const { payload } of events) assert.deepEqual(Object.keys(payload).sort(), ['currency', 'items', 'value']);
+  for (const { event, payload } of events) assert.deepEqual(Object.keys(payload).sort(), event === 'generate_lead' ? ['currency', 'product', 'value'] : ['currency', 'items', 'product', 'value']);
   assert.doesNotMatch(JSON.stringify(events), /phone|name":"Тест|099|customer/);
   consent = false; assert.equal(track('view_item'), false);
 });

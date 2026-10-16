@@ -225,3 +225,20 @@ a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visibl
   html { scroll-behavior: auto; }
   *, *:before, *:after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Consent stays in document flow: it never covers forms or sticky controls. */
+[hidden] { display: none !important; }
+.consent { margin-block: 16px; padding: 16px; border: 1px solid var(--line, #ddd); border-radius: 16px; scroll-margin-top: calc(var(--anchor-offset, 0px) + 12px); }
+.consent h2 { margin: 0 0 6px; font-size: 16px; }
+.consent p { margin: 0; font-size: 14px; line-height: 1.6; }
+.consent p a, .privacy a { text-decoration: underline; text-underline-offset: 3px; }
+.consent__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.consent__button { min-height: 44px; padding: 9px 16px; border: 1px solid currentColor; border-radius: 10px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.consent__button:focus-visible, .cookie-settings:focus-visible { outline: 3px solid #246bfd; outline-offset: 3px; }
+.consent #consent-status:not(:empty) { margin-top: 10px; }
+.cookie-settings { min-height: 44px; border: 0; padding: 8px; background: transparent; color: inherit; font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
+.privacy { max-width: 760px; padding-block: 32px; overflow-wrap: anywhere; }
+.privacy h1 { font-size: clamp(28px, 6vw, 44px); margin-block: 24px; }
+.privacy h2 { font-size: 22px; margin-block: 24px 12px; }
+.privacy p { line-height: 1.7; margin-block: 12px; }
+@media (min-width: 768px) { .consent { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; } .consent__actions { margin: 0; } }
