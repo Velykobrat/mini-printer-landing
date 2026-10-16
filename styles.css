@@ -15,6 +15,7 @@
   --border: 1px solid var(--line);
   --pill: 999px;
   --container: 1160px;
+  --anchor-offset: 77px; /* No-JS fallback: 76px header content + border. */
   --section-space: 80px;
   --body-size: 16px;
   --label-size: 12px;
@@ -22,7 +23,7 @@
   --mobile-bar-space: calc(90px + env(safe-area-inset-bottom, 0px));
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 95px; }
+html { scroll-behavior: smooth; scroll-padding-top: var(--anchor-offset); }
 body { margin: 0; background: var(--background); color: var(--text); font-family: 'Manrope', sans-serif; font-size: var(--body-size); -webkit-font-smoothing: antialiased; }
 img { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
@@ -39,6 +40,8 @@ button, input { font: inherit; }
 .button { min-height: 54px; padding: 0 28px; display: inline-flex; gap: 16px; align-items: center; justify-content: center; border: 0; border-radius: var(--pill); background: var(--accent); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 180ms ease, background 180ms ease; }
 .button:hover { background: var(--accent-dark); transform: translateY(-2px); }
 .button--small { min-height: var(--touch-target); padding-inline: 20px; font-size: var(--label-size); }
+.header-order { width: max-content; flex-shrink: 0; justify-content: center; gap: 6px; }
+.header-pricing { display: none; }
 .button--full { width: 100%; }
 .button:disabled { cursor: not-allowed; opacity: .65; transform: none; }
 .text-link { display: inline-flex; align-items: center; min-height: var(--touch-target); font-size: var(--label-size); font-weight: 700; }
@@ -109,7 +112,8 @@ button, input { font: inherit; }
 .faq details p { font-size: var(--body-size); line-height: 1.8; color: var(--muted); }
 
 /* Order form */
-.order-section { padding: 75px 0 85px; }
+/* Reserve only the visible viewport: anchor alignment needs no arbitrary trailing spacer. */
+.order-section { padding: 75px 0 85px; min-block-size: calc(100svh - var(--anchor-offset)); min-block-size: calc(100dvh - var(--anchor-offset)); }
 .order-grid { padding: 50px; background: var(--mint-surface); border-radius: 32px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 60px; align-items: center; }
 .order-copy h2 { margin: 0; font-size: 44px; line-height: 1.13; letter-spacing: -.045em; font-weight: 800; }
 .order-copy > p:not(.eyebrow) { max-width: 500px; margin: 20px 0 0; color: var(--muted); font-size: var(--body-size); line-height: 1.8; }
@@ -117,8 +121,8 @@ button, input { font: inherit; }
 .order-price strong { font-size: 34px; letter-spacing: -.05em; }
 .order-price del { color: var(--muted); font-size: 14px; }
 .order-form .button { padding-inline: 16px; gap: 6px; flex-wrap: wrap; }
-/* #order is the focusable form card; root scroll-padding accounts for the sticky header. */
-.order-form { scroll-margin-top: 0; min-width: 0; padding: 30px; border-radius: 24px; background: var(--surface); box-shadow: 0 8px 30px #273c3010; }
+/* #order is the section start; one measured root offset serves every navigation anchor. */
+.order-form { min-width: 0; padding: 30px; border-radius: 24px; background: var(--surface); box-shadow: 0 8px 30px #273c3010; }
 .form-title { margin: 0 0 22px; font-size: 19px; }
 .order-form label { display: block; margin-bottom: 17px; }
 .order-form label > span:first-child { display: block; margin-bottom: 9px; font-size: var(--label-size); font-weight: 700; }
@@ -135,17 +139,16 @@ button, input { font: inherit; }
 
 /* Footer, accessibility and floating mobile action */
 .footer { padding: 24px 0; border-top: var(--border); background: #eeede5; }
-.footer__inner { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
-.footer-meta { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.footer__inner { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 4px 8px; text-align: center; }
 .footer-brand { font-size: 14px; font-weight: 800; letter-spacing: -.04em; }
-.footer p { margin: 0; color: var(--muted); font-size: var(--label-size); }
-.footer-credit { min-width: 0; text-align: left; overflow-wrap: anywhere; }
-.footer .footer-copyright { margin-inline-start: auto; white-space: nowrap; }
+.footer-credit, .footer-copyright { color: var(--muted); font-size: var(--label-size); }
+.footer-credit { min-width: 0; overflow-wrap: anywhere; }
+.footer-copyright { white-space: nowrap; }
 .mobile-order { display: none; }
 .honeypot { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .skip-link { position: fixed; left: 16px; top: -100px; z-index: 200; background: var(--surface); padding: 12px; border-radius: 10px; }
 .skip-link:focus { top: 10px; }
-a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible, .order-form:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible, .order-section:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
 /* Tablet: keep the approved two-column hero, with paired benefit cards. */
 @media (max-width: 950px) {
@@ -165,11 +168,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visibl
 }
 /* Mobile, including a 320px viewport and the onscreen keyboard. */
 @media (max-width: 680px) {
-  html { scroll-padding-top: 16px; }
+  html { --anchor-offset: 0px; }
   .header { position: static; top: auto; z-index: auto; }
   .container { width: calc(100% - 32px); }
   .nav, .header-order { display: none; }
-  .header__inner { min-height: 66px; }
+  .header__inner { min-height: 66px; gap: 12px; }
+  .header-pricing { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+  .header-pricing strong { font-size: 16px; font-weight: 800; }
+  .header-pricing del { color: var(--muted); font-size: 12px; }
+  .header-discount { color: var(--accent); font-size: 12px; font-weight: 700; }
+  .hero__price .saving { display: none; }
   .logo { font-size: 15px; }
   .button--small { font-size: var(--label-size); padding-inline: 14px; }
   .hero { padding: 30px 0 48px; }

@@ -6,7 +6,7 @@ import { PRODUCT, formatPrice } from '../shared/product.js';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const html = read('index.html'); const css = read('styles.css');
 test('static price slots agree with server config and Product schema', () => {
-  const slots = [...html.matchAll(/data-price="current"[^>]*>([^<]+)</g)]; assert.equal(slots.length, 4);
+  const slots = [...html.matchAll(/data-price="current"[^>]*>([^<]+)</g)]; assert.equal(slots.length, 5);
   for (const [, value] of slots) assert.equal(value, formatPrice(PRODUCT.price));
   const schema = JSON.parse(/<script type="application\/ld\+json">([^<]+)<\/script>/.exec(html)[1]);
   assert.equal(schema.offers.price, PRODUCT.price); assert.equal(schema.offers.priceCurrency, PRODUCT.currency);
@@ -51,28 +51,39 @@ test('order section has one current price and a price-free heading/submit label'
   assert.match(section, /<h2 id="order-title">Замовити Mini Printer<\/h2>/);
   const button = /<button[^>]+type="submit"[^>]*>([\s\S]*?)<\/button>/.exec(section)[1].trim();
   assert.equal(button, 'Надіслати заявку');
-  assert.match(section, /class="order-form" id="order" tabindex="-1" aria-labelledby="order-form-heading"/);
+  assert.match(section, /class="order-section" id="order" tabindex="-1" aria-labelledby="order-title"/);
   assert.match(section, /id="order-note">Залиште контакти — ми зв'яжемося з вами для підтвердження деталей./);
 });
 test('initial sticky state is hidden and only the mobile header CTA is suppressed', () => {
   assert.match(html, /<aside class="mobile-order is-hidden"/);
   assert.match(html, /class="button button--small header-order" href="#order"/);
   assert.match(css, /@media \(max-width: 680px\)[\s\S]*?\.nav, \.header-order { display: none; }/);
-  assert.match(css, /html { scroll-padding-top: 16px; }/);
+  assert.match(css, /html { --anchor-offset: 0px; }/);
 });
 
 test('mobile header remains in document flow and desktop header remains sticky', () => {
   assert.match(css, /\.header { position: sticky; top: 0;/);
   const mobile = css.slice(css.indexOf('@media (max-width: 680px)'));
   assert.match(mobile, /\.header { position: static; top: auto; z-index: auto; }/);
-  assert.match(mobile, /html { scroll-padding-top: 16px; }/);
+  assert.match(mobile, /html { --anchor-offset: 0px; }/);
   assert.doesNotMatch(mobile, /scroll-padding-top: 80px/);
 });
 
-test('footer has brand first, then credit and copyright on a wrapping baseline row', () => {
+test('footer is one centered wrapping composition on desktop and mobile', () => {
   const footer = /<footer class="footer">([\s\S]*?)<\/footer>/.exec(html)[1];
-  assert.match(footer, /<span class="footer-brand">Mini Printer<\/span>\s*<div class="footer-meta">\s*<p class="footer-credit">by BeBetter Development<\/p>\s*<p class="footer-copyright">© 2026<\/p>\s*<\/div>/);
-  assert.match(css, /\.footer-meta { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;/);
-  assert.match(css, /\.footer \.footer-copyright { margin-inline-start: auto; white-space: nowrap; }/);
-  assert.doesNotMatch(css, /\.footer-credit { flex-basis: 100%/);
+  assert.match(footer, /<span class="footer-brand">Mini Printer<\/span>\s*<span class="footer-credit">by BeBetter Development<\/span>\s*<span class="footer-copyright">© 2026<\/span>/);
+  assert.match(css, /\.footer__inner { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center;/);
+  assert.doesNotMatch(css, /margin-inline-start: auto|footer-meta/);
+});
+test('compact header prices and desktop CTA use shared price slots', () => {
+  const header = /<header class="header">([\s\S]*?)<\/header>/.exec(html)[1];
+  assert.match(header, /Замовити · <span data-price="current">800 грн<\/span>/);
+  assert.match(header, /class="header-pricing"[\s\S]*?data-price="discount">−33%/);
+  assert.match(css, /\.header-order { width: max-content; flex-shrink: 0; justify-content: center; gap: 6px; }/);
+  assert.match(css, /\.hero__price \.saving { display: none; }/);
+});
+test('section anchor uses one measured root offset and a viewport-sized order section', () => {
+  assert.match(css, /scroll-padding-top: var\(--anchor-offset\)/);
+  assert.match(css, /min-block-size: calc\(100svh - var\(--anchor-offset\)\)/);
+  assert.doesNotMatch(html, /class="order-form" id="order"/);
 });

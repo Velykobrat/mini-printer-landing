@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initOrderNavigation, initStickyOrder } from '../script.js';
+import { initAnchorOffsets, initOrderNavigation, initStickyOrder } from '../script.js';
 
 class Events {
   constructor() { this.listeners = new Map(); }
@@ -34,20 +34,21 @@ function setup({ mobile = true, reduceMotion = false, hash = '', readyState = 'c
   const settle = () => { frame(); const queued = [...timers.values()]; timers.clear(); for (const timer of queued) timer.fn(); frame(); };
   const hero = new Node(doc, { top: 300, bottom: 354 });
   const section = new Node(doc, { top: 3000, bottom: 3700 });
-  const target = new Node(doc); const field = new Node(doc); field.editable = true; section.children = [target, field];
+  const target = section; const field = new Node(doc); field.editable = true; section.children = [field];
   const bar = new Node(doc); const stickyLink = new Node(doc); bar.children = [stickyLink];
   const header = new Node(doc, { top: 0, bottom: 66 });
   const headerLink = new Node(doc); const heroLink = hero;
   const links = [headerLink, heroLink, stickyLink];
   doc.getElementById = id => ({ order: target, 'order-section': section })[id];
   doc.querySelector = selector => ({ '.mobile-order': bar, '.hero__actions a[href="#order"]': hero, '.header': header })[selector];
+  doc.documentElement = { values: {}, style: { setProperty(key, value) { doc.documentElement.values[key] = value; } } };
   doc.querySelectorAll = selector => selector === 'a[href="#order"]' ? links : [];
   let notify;
   const observed = [];
   if (observer) win.IntersectionObserver = class { constructor(callback) { notify = callback; } observe(node) { observed.push(node); } };
   const tick = () => { notify?.([]); frame(); };
   const hidden = () => bar.classes.has('is-hidden');
-  return { doc, win, media, hero, section, target, field, bar, stickyLink, headerLink, links, timers, observed, frame, settle, tick, hidden };
+  return { doc, win, media, hero, section, target, field, bar, stickyLink, header, headerLink, links, timers, observed, frame, settle, tick, hidden };
 }
 function sticky(options) { const ui = setup(options); initStickyOrder({ document: ui.doc, window: ui.win }); return ui; }
 const passHero = ui => { ui.hero.rect = { top: -74, bottom: -20 }; ui.tick(); };
@@ -103,7 +104,7 @@ test('hiding a focused sticky link transfers focus to non-editable form target',
 function click(link, modifiers = {}) {
   const event = { button: 0, preventDefault() { this.prevented = true; }, ...modifiers }; link.fire('click', event); return event;
 }
-for (const reduceMotion of [false, true]) test(`all CTAs scroll to form without focusing inputs; reduced motion=${reduceMotion}`, () => {
+for (const reduceMotion of [false, true]) test(`all CTAs scroll to section start without focusing inputs; reduced motion=${reduceMotion}`, () => {
   const ui = setup({ reduceMotion }); initOrderNavigation({ document: ui.doc, window: ui.win });
   for (const link of ui.links) {
     assert.equal(click(link).prevented, true); assert.equal(ui.doc.activeElement, ui.target); assert.equal(ui.field.focusOptions, undefined);
@@ -117,7 +118,7 @@ test('modifier/middle clicks retain native navigation behavior', () => {
   for (const modifiers of [{ ctrlKey: true }, { metaKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }, { defaultPrevented: true }]) assert.equal(click(ui.headerLink, modifiers).prevented, undefined);
   assert.equal(ui.target.scrolls, undefined);
 });
-test('direct #order and subsequent hash changes target the same form card', () => {
+test('direct #order and subsequent hash changes target the same order section', () => {
   const ui = setup({ hash: '#order' }); initOrderNavigation({ document: ui.doc, window: ui.win }); assert.equal(ui.target.scrolls.length, 1);
   ui.win.fire('hashchange'); assert.equal(ui.target.scrolls.length, 2);
   ui.win.location.hash = '#features'; ui.win.fire('hashchange'); assert.equal(ui.target.scrolls.length, 2);
@@ -130,4 +131,20 @@ test('initial deep link waits for layout load when the document is still loading
 test('a partially visible Hero CTA stays visible instead of being treated as behind a sticky header', () => {
   const ui = sticky(); ui.hero.rect = { top: -14, bottom: 40 }; ui.tick(); ui.settle(); assert(ui.hidden());
   passHero(ui); ui.settle(); assert.equal(ui.hidden(), false);
+});
+
+test('anchor offsets track exact desktop header size and return to zero on mobile', () => {
+  const ui = setup({ mobile: false });
+  let resize; ui.win.ResizeObserver = class { constructor(callback) { resize = callback; } observe(node) { assert.equal(node, ui.header); } };
+  const sync = initAnchorOffsets({ document: ui.doc, window: ui.win });
+  assert.equal(ui.doc.documentElement.values['--anchor-offset'], '66px');
+  ui.header.rect = { top: 0, bottom: 91.3, height: 91.3 }; resize();
+  assert.equal(ui.doc.documentElement.values['--anchor-offset'], '91.3px');
+  ui.media.matches = true; ui.media.fire('change'); assert.equal(ui.doc.documentElement.values['--anchor-offset'], '0px');
+  ui.media.matches = false; sync(); assert.equal(ui.doc.documentElement.values['--anchor-offset'], '91.3px');
+});
+test('order navigation refreshes header measurement for every repeated click', () => {
+  const ui = setup(); let calls = 0;
+  initOrderNavigation({ document: ui.doc, window: ui.win, syncOffset: () => { calls++; } });
+  click(ui.headerLink); click(ui.headerLink); assert.equal(calls, 2); assert.equal(ui.target.scrolls.length, 2);
 });
