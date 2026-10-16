@@ -9,7 +9,7 @@
 - Cross-site browser requests rejected by Origin/Fetch Metadata. Missing Origin remains possible for tools/bots; this is not authentication or spam prevention by itself. No wildcard CORS response.
 - Server price comes only from shared product configuration. Telegram plain text (no parse_mode), 8s deadline, no retries, HTTP + JSON acceptance checked.
 - Provider errors return generic 502/503/504 without provider text, customer data or secrets. No PII logging in application code. Hosting access logs/retention are outside this code's control.
-- CSP, nosniff, referrer policy, frame denial and unused camera/microphone/geolocation denial in vercel.json. Google Fonts remains the only third-party frontend resource by default.
+- CSP, nosniff, referrer policy, frame denial and unused camera/microphone/geolocation denial in vercel.json. Google Fonts remains the only third-party frontend resource before analytics consent. GA4 is consent-gated; see [analytics.md](analytics.md) for CSP origins, opt-out, account prerequisites and privacy limits.
 
 ## Rate limiting — must be configured on Vercel
 

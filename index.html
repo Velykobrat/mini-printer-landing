@@ -56,7 +56,7 @@
         <a class="logo" href="#top">Mini Printer</a>
 
         <nav class="nav" aria-label="Основна навігація"><a href="#features">Переваги</a><a href="#scenarios">Для твоїх ідей</a><a href="#specs">Характеристики</a></nav>
-        <a class="button button--small header-order" href="#order">
+        <a class="button button--small header-order" href="#order" data-cta-location="header">
           Замовити · <span data-price="current">800 грн</span>
         </a>
         <div class="header-pricing" aria-label="Ціна Mini Printer">
@@ -67,6 +67,17 @@
       </div>
     </header>
 
+    <section class="consent container" id="analytics-consent" tabindex="-1" aria-labelledby="consent-title">
+      <div><h2 id="consent-title">Аналітичні cookies</h2>
+        <p>Ми використовуємо аналітичні cookies, щоб розуміти, як працює сайт, і покращувати його. Вибір не впливає на замовлення. <a href="./privacy.html">Про конфіденційність</a></p></div>
+      <div class="consent__actions">
+        <button class="consent__button" id="consent-accept" type="button" disabled>Прийняти</button>
+        <button class="consent__button" id="consent-reject" type="button" disabled>Відхилити</button>
+        <button class="consent__button" id="consent-withdraw" type="button" hidden disabled>Відкликати згоду</button>
+      </div>
+      <p id="consent-status" role="status" aria-live="polite"></p>
+      <noscript><p>JavaScript вимкнено — аналітика не завантажується.</p></noscript>
+    </section>
     <main id="top" tabindex="-1">
 
       <!-- HERO -->
@@ -94,7 +105,7 @@
             </div>
 
             <div class="hero__actions">
-              <a class="button" href="#order">Замовити принтер <span aria-hidden="true">↗</span></a>
+              <a class="button" href="#order" data-cta-location="hero">Замовити принтер <span aria-hidden="true">↗</span></a>
 
               <a class="text-link" href="#scenarios">
                 Що можна друкувати ↓
@@ -339,10 +350,11 @@
         <span class="footer-brand">Mini Printer</span>
         <span class="footer-credit">by BeBetter Development</span>
         <span class="footer-copyright">© 2026</span>
+        <button class="cookie-settings" id="cookie-settings" type="button">Налаштування cookies</button>
       </div>
     </footer>
 
-    <aside class="mobile-order is-hidden" aria-label="Швидке замовлення"><div><small>Mini Printer</small><strong data-price="current">800 грн</strong></div><a class="button" href="#order">Замовити ↗</a></aside>
+    <aside class="mobile-order is-hidden" aria-label="Швидке замовлення"><div><small>Mini Printer</small><strong data-price="current">800 грн</strong></div><a class="button" href="#order" data-cta-location="sticky_bar">Замовити ↗</a></aside>
     <script type="module" src="./script.js"></script>
     
   </body>

@@ -1,6 +1,7 @@
 import { validateOrder } from './shared/validation.js';
 import { ANALYTICS } from './analytics-config.js';
-import { createAnalytics } from './analytics.js';
+import { createAnalytics, createGoogleTag } from './analytics.js';
+import { createConsent, initConsentUI } from './consent.js';
 
 export function initOrderForm({ document: doc = document, fetchImpl = globalThis.fetch,
   track = () => {}, timeoutMs = 12000 } = {}) {
@@ -9,7 +10,12 @@ export function initOrderForm({ document: doc = document, fetchImpl = globalThis
   if (!form || !status) return;
   const button = form.querySelector('button[type="submit"]');
   const fields = { name: form.elements.namedItem('name'), phone: form.elements.namedItem('phone') };
-  const safeTrack = (event) => { try { track(event); } catch { /* Tracking cannot affect orders. */ } };
+  let attempt = 1;
+  let attemptStarted = false;
+  const safeTrack = (event) => { try { track(event, { attempt }); } catch { /* Tracking cannot affect orders. */ } };
+  const beginAttempt = () => {
+    if (!attemptStarted) { attemptStarted = true; safeTrack('begin_checkout'); }
+  };
   const idleLabel = 'Надіслати заявку';
   let inFlight = false;
   let lastAccepted = null; // Tab-local duplicate guard, not distributed idempotency.
@@ -27,10 +33,11 @@ export function initOrderForm({ document: doc = document, fetchImpl = globalThis
     }
   };
   form.addEventListener('focusin', (event) => {
-    if (Object.values(fields).includes(event.target)) safeTrack('begin_checkout');
+    if (Object.values(fields).includes(event.target)) beginAttempt();
   });
   form.addEventListener('input', (event) => {
     if (Object.values(fields).includes(event.target)) {
+      beginAttempt();
       event.target.removeAttribute('aria-invalid');
       const error = doc.getElementById(`error-${event.target.name}`);
       if (error) error.textContent = '';
@@ -39,6 +46,7 @@ export function initOrderForm({ document: doc = document, fetchImpl = globalThis
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (inFlight) return;
+    beginAttempt();
     const payload = { name: fields.name.value, phone: fields.phone.value,
       'bot-field': form.elements.namedItem('bot-field')?.value || '' };
     const checked = validateOrder(payload);
@@ -87,6 +95,8 @@ export function initOrderForm({ document: doc = document, fetchImpl = globalThis
       setStatus('Дякуємо! Заявку прийнято. Ми зв’яжемося з вами для підтвердження деталей.', 'success');
       form.reset();
       safeTrack('generate_lead');
+      attempt++;
+      attemptStarted = false;
     } catch {
       setStatus('Не вдалося підтвердити заявку. Вона могла надійти. Перевірте інтернет-з’єднання перед повторною спробою.', 'error');
     } finally {
@@ -120,7 +130,7 @@ export function initAnchorOffsets({ document: doc = document, window: win = wind
 }
 
 // Both mouse/keyboard CTAs and direct #order links target the order section start.
-export function initOrderNavigation({ document: doc = document, window: win = window, syncOffset = () => {} } = {}) {
+export function initOrderNavigation({ document: doc = document, window: win = window, syncOffset = () => {}, track = () => {} } = {}) {
   const target = doc.getElementById('order');
   if (!target) return;
   const scroll = () => {
@@ -136,6 +146,7 @@ export function initOrderNavigation({ document: doc = document, window: win = wi
     link.addEventListener('click', (event) => {
       if (event.defaultPrevented || (event.button ?? 0) !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
+      try { track('order_click', { cta_location: link.dataset?.ctaLocation || 'other' }); } catch { /* Navigation is independent of analytics. */ }
       if (win.location.hash !== '#order') win.history.pushState(null, '', '#order');
       scroll(); // Repeated clicks realign the form, even when the hash is unchanged.
     });
@@ -214,16 +225,19 @@ export function initStickyOrder({ document: doc = document, window: win = window
 }
 
 if (typeof document !== 'undefined') {
-  const track = createAnalytics({ enabled: ANALYTICS.enabled,
-    hasConsent: () => window.miniPrinterAnalyticsConsent === true,
-    send: (event, payload) => {
-      if (typeof window.gtag !== 'function') return false;
-      window.gtag('event', event, payload);
+  let track = () => false;
+  try {
+    const consent = createConsent({ onChange: granted => {
+      if (granted) { tag.enable(); track('view_item'); } else tag.disable();
     } });
-  track('view_item');
-  window.addEventListener('mini-printer:analytics-consent', () => track('view_item'));
+    const tag = createGoogleTag({ hasConsent: () => consent.hasConsent() });
+    track = createAnalytics({ enabled: ANALYTICS.enabled,
+      hasConsent: () => consent.hasConsent(), send: (event, payload) => tag.send(event, payload) });
+    initConsentUI({ consent });
+    consent.start();
+  } catch { /* Storage, DOM or Google failures must never prevent ordering. */ }
   initOrderForm({ track });
   const syncOffset = initAnchorOffsets();
-  initOrderNavigation({ syncOffset });
+  initOrderNavigation({ syncOffset, track });
   initStickyOrder();
 }

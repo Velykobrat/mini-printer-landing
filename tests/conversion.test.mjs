@@ -104,6 +104,15 @@ test('hiding a focused sticky link transfers focus to non-editable form target',
 function click(link, modifiers = {}) {
   const event = { button: 0, preventDefault() { this.prevented = true; }, ...modifiers }; link.fire('click', event); return event;
 }
+test('actual CTA handlers emit one location-specific order_click; hash navigation emits none', () => {
+  const ui = setup(); const sent = [];
+  ui.links.forEach((link, index) => { link.dataset = { ctaLocation: ['header', 'hero', 'sticky_bar'][index] }; });
+  initOrderNavigation({ document: ui.doc, window: ui.win, track: (event, params) => sent.push({ event, params }) });
+  ui.links.forEach(link => click(link));
+  assert.deepEqual(sent.map(item => item.params.cta_location), ['header', 'hero', 'sticky_bar']);
+  assert(sent.every(item => item.event === 'order_click'));
+  click(ui.links[0], { ctrlKey: true }); ui.win.fire('hashchange'); assert.equal(sent.length, 3);
+});
 for (const reduceMotion of [false, true]) test(`all CTAs scroll to section start without focusing inputs; reduced motion=${reduceMotion}`, () => {
   const ui = setup({ reduceMotion }); initOrderNavigation({ document: ui.doc, window: ui.win });
   for (const link of ui.links) {
