@@ -29,6 +29,9 @@
       content="Компактний портативний термопринтер для фото, нотаток, списків і наліпок прямо зі смартфона." />
 
     <meta name="theme-color" content="#fbf9f2" />
+    <meta property="og:image:width" content="630" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Блакитний портативний термопринтер Mini Printer" />
     <meta name="robots" content="index, follow" />
 
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
@@ -36,11 +39,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap"
       rel="stylesheet"
     />
 
     <link rel="stylesheet" href="styles.css" />
+    <!-- product-schema:start -->
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Mini Printer","description":"Портативний термопринтер для чорно-білого друку фото, нотаток і списків зі смартфона.","image":"https://mini-printer-landing.vercel.app/images/mini-printer-blue.jpg","offers":{"@type":"Offer","url":"https://mini-printer-landing.vercel.app/","price":800,"priceCurrency":"UAH"}}</script>
+    <!-- product-schema:end -->
   </head>
 
   <body>
@@ -51,12 +57,12 @@
 
         <nav class="nav" aria-label="Основна навігація"><a href="#features">Переваги</a><a href="#scenarios">Для твоїх ідей</a><a href="#specs">Характеристики</a></nav>
         <a class="button button--small" href="#order">
-          Замовити — 800 грн
+          Замовити — <span data-price="current">800 грн</span>
         </a>
       </div>
     </header>
 
-    <main id="top">
+    <main id="top" tabindex="-1">
 
       <!-- HERO -->
 
@@ -79,10 +85,10 @@
             <div class="hero__price">
               <div>
                 <span class="price-label">Акційна ціна</span>
-                <strong>800 грн</strong>
+                <strong data-price="current">800 грн</strong>
               </div>
 
-              <del>1 200 грн</del><span class="saving">−33% · вигода 400 грн</span>
+              <del data-price="reference">1 200 грн</del><span class="saving"><span data-price="discount">−33%</span> · вигода <span data-price="savings">400 грн</span></span>
             </div>
 
             <div class="hero__actions">
@@ -102,10 +108,10 @@
 
           <div class="hero__visual">
             <div class="product-card">
-              <span class="product-badge">−33%</span>
+              <span class="product-badge" data-price="discount">−33%</span>
 
               <img src="./images/mini-printer-blue.jpg" alt="Портативний термопринтер Mini Printer" decoding="async"
-                fetchpriority="high" width="600" height="600" />
+                fetchpriority="high" width="630" height="630" />
               <div class="visual-caption"><span>MINI PRINTER / 01</span><span>Ідеї стають відчутними.</span></div>
             </div>
           </div>
@@ -129,7 +135,7 @@
 
           <div class="features-grid">
 
-            <article class="feature feature--large">
+            <article class="feature">
               <span class="feature-number" aria-hidden="true">◌</span>
 
               <h3>Без чорнил</h3>
@@ -180,7 +186,7 @@
 
       <!-- MEDIA -->
 
-      <section class="section section--media" id="scenarios">
+      <section class="section" id="scenarios">
         <div class="container">
 
           <div class="section-heading section-heading--row">
@@ -196,12 +202,12 @@
           </div>
 
           <div class="scenarios">
-            <figure class="lifestyle"><img src="./images/mini-printer-use.jpg" alt="Mini Printer та приклади друку на термопапері" loading="lazy" decoding="async" width="640" height="480"><figcaption><h3>Маленькі речі. Твої великі ідеї.</h3><p>Від збереженої картинки до нотатки у планері — дай своїм ідеям місце поза екраном.</p></figcaption></figure>
+            <figure class="lifestyle"><img src="./images/mini-printer-use.jpg" alt="Блакитний Mini Printer і приклади підписів на баночках та органайзерах" loading="lazy" decoding="async" width="630" height="630"><figcaption><h3>Маленькі речі. Твої великі ідеї.</h3><p>Від збереженої картинки до нотатки у планері — дай своїм ідеям місце поза екраном.</p></figcaption></figure>
             <div class="scenario-list">
-              <article class="scenario"><span aria-hidden="true">✎</span><div><b>Навчання без перемальовування</b><p>Формули, схеми й короткі конспекти — друкуй і додавай до зошита.</p></div></article>
-              <article class="scenario"><span aria-hidden="true">✓</span><div><b>Плани, які хочеться виконувати</b><p>Чеклісти, трекери звичок і списки справ для твого щоденника.</p></div></article>
-              <article class="scenario"><span aria-hidden="true">♡</span><div><b>Спогади, які можна потримати</b><p>Чорно-білі знімки, колажі та маленькі доповнення до подарунків.</p></div></article>
-              <article class="scenario"><span aria-hidden="true">⌑</span><div><b>Кожній речі — своє місце</b><p>Підписи для коробок, баночок і папок. Для наліпок потрібен самоклейний термопапір.</p></div></article>
+              <article class="scenario"><span aria-hidden="true">✎</span><div><h3>Навчання без перемальовування</h3><p>Формули, схеми й короткі конспекти — друкуй і додавай до зошита.</p></div></article>
+              <article class="scenario"><span aria-hidden="true">✓</span><div><h3>Плани, які хочеться виконувати</h3><p>Чеклісти, трекери звичок і списки справ для твого щоденника.</p></div></article>
+              <article class="scenario"><span aria-hidden="true">♡</span><div><h3>Спогади, які можна потримати</h3><p>Чорно-білі знімки, колажі та маленькі доповнення до подарунків.</p></div></article>
+              <article class="scenario"><span aria-hidden="true">⌑</span><div><h3>Кожній речі — своє місце</h3><p>Підписи для коробок, баночок і папок. Для наліпок потрібен самоклейний термопапір.</p></div></article>
             </div>
           </div>
 
@@ -291,11 +297,11 @@
         <div class="container order-grid">
 
           <div class="order-copy">
-            <p class="eyebrow eyebrow--light">ЗАМОВЛЕННЯ</p>
+            <p class="eyebrow">ЗАМОВЛЕННЯ</p>
 
             <h2>
               Ваш Mini Printer<br />
-              за 800 грн.
+              за <span data-price="current">800 грн</span>.
             </h2>
 
             <p>
@@ -304,13 +310,13 @@
             </p>
 
             <div class="order-price">
-              <strong>800 грн</strong>
-              <del>1200 грн</del>
+              <strong data-price="current">800 грн</strong>
+              <del data-price="reference">1 200 грн</del>
             </div>
           </div>
 
           <div class="order-form">
-            <h3 class="form-title">Оформити замовлення</h3><form id="order-form">
+            <h3 class="form-title">Оформити замовлення</h3><form id="order-form" method="post" action="/api/order" aria-describedby="order-note">
               <p class="honeypot" aria-hidden="true">
                 <label>
                   Не заповнюйте це поле:
@@ -320,26 +326,30 @@
             
               <label>
                 <span>Ваше ім'я</span>
-                <input type="text" name="name" placeholder="Віталій" autocomplete="name" minlength="2" maxlength="60" required />
+                <input type="text" id="customer-name" name="name" aria-describedby="error-name" placeholder="Віталій" autocomplete="name" minlength="2" maxlength="60" required />
+                <span class="field-error" id="error-name"></span>
               </label>
             
               <label>
                 <span>Номер телефону</span>
-                <input type="tel" name="phone" placeholder="+380 XX XXX XX XX" autocomplete="tel" inputmode="tel" minlength="10" maxlength="19"
+                <input type="tel" id="customer-phone" name="phone" aria-describedby="phone-hint error-phone" placeholder="+380 XX XXX XX XX" autocomplete="tel" inputmode="tel" minlength="10" maxlength="32"
                   required />
+                <span class="field-error" id="error-phone"></span>
               </label>
             
               <button class="button button--full" type="submit">
-                Замовити за 800 грн
+                <span>Замовити за <span data-price="current">800 грн</span></span>
               </button>
             
-              <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+              <p class="form-status" id="form-status" role="status" aria-live="polite" aria-atomic="true"></p>
             
-              <p class="form-note">
+              <p class="form-note" id="phone-hint">Підійде номер 0XX XXX XX XX або міжнародний номер із +.</p>
+              <p class="form-note" id="order-note">
                 Після заявки менеджер зв'яжеться з вами для
                 підтвердження деталей.
               </p>
             </form>
+            <noscript><p class="form-status form-status--error">Для надсилання заявки потрібен JavaScript. Увімкніть його та оновіть сторінку.</p></noscript>
           </div>
 
         </div>
@@ -361,8 +371,8 @@
       </div>
     </footer>
 
-    <aside class="mobile-order" aria-label="Швидке замовлення"><div><small>Mini Printer</small><strong>800 грн</strong></div><a class="button" href="#order">Замовити ↗</a></aside>
-    <script src="./script.js"></script>
+    <aside class="mobile-order" aria-label="Швидке замовлення"><div><small>Mini Printer</small><strong data-price="current">800 грн</strong></div><a class="button" href="#order">Замовити ↗</a></aside>
+    <script type="module" src="./script.js"></script>
     
   </body>
 </html>

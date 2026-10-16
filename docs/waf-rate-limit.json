@@ -1,0 +1,13 @@
+{
+  "name": "Mini Printer order endpoint — observe before enforcement",
+  "conditionGroup": [{ "conditions": [
+    { "type": "path", "op": "eq", "value": "/api/order" },
+    { "type": "method", "op": "eq", "value": "POST" }
+  ] }],
+  "action": {
+    "mitigate": {
+      "action": "rate_limit",
+      "rateLimit": { "algo": "fixed_window", "window": 60, "limit": 30, "keys": ["ip"], "action": "log" }
+    }
+  }
+}
