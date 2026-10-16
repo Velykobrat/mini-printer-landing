@@ -100,11 +100,31 @@ export function initOrderForm({ document: doc = document, fetchImpl = globalThis
   });
 }
 
-// Both mouse/keyboard CTAs and direct #order links target the actual form card.
-export function initOrderNavigation({ document: doc = document, window: win = window } = {}) {
+// Share the exact sticky-header measurement with all native section anchors.
+export function initAnchorOffsets({ document: doc = document, window: win = window } = {}) {
+  const header = doc.querySelector('.header');
+  const root = doc.documentElement;
+  if (!header || !root) return () => {};
+  const mobile = win.matchMedia?.('(max-width: 680px)');
+  const sync = () => {
+    const isMobile = mobile?.matches ?? win.innerWidth <= 680;
+    const bounds = header.getBoundingClientRect();
+    const height = isMobile ? 0 : bounds.height ?? bounds.bottom - bounds.top;
+    root.style.setProperty('--anchor-offset', height + 'px');
+  };
+  sync();
+  win.addEventListener('resize', sync);
+  mobile?.addEventListener?.('change', sync);
+  if ('ResizeObserver' in win) new win.ResizeObserver(sync).observe(header);
+  return sync;
+}
+
+// Both mouse/keyboard CTAs and direct #order links target the order section start.
+export function initOrderNavigation({ document: doc = document, window: win = window, syncOffset = () => {} } = {}) {
   const target = doc.getElementById('order');
   if (!target) return;
   const scroll = () => {
+    syncOffset();
     doc.querySelector('.mobile-order')?.classList.toggle('is-hidden', true);
     // Focus a non-editable container: accessible arrival without opening a keyboard
     // or firing begin_checkout before the visitor interacts with a field.
@@ -129,7 +149,7 @@ export function initOrderNavigation({ document: doc = document, window: win = wi
 export function initStickyOrder({ document: doc = document, window: win = window, showDelayMs = 180 } = {}) {
   const bar = doc.querySelector('.mobile-order');
   const hero = doc.querySelector('.hero__actions a[href="#order"]');
-  const section = doc.getElementById('order-section');
+  const section = doc.getElementById('order');
   const target = doc.getElementById('order');
   if (!bar) return;
   bar.classList.toggle('is-hidden', true); // Also hidden in HTML: no first-paint duplicate.
@@ -203,6 +223,7 @@ if (typeof document !== 'undefined') {
   track('view_item');
   window.addEventListener('mini-printer:analytics-consent', () => track('view_item'));
   initOrderForm({ track });
-  initOrderNavigation();
+  const syncOffset = initAnchorOffsets();
+  initOrderNavigation({ syncOffset });
   initStickyOrder();
 }
