@@ -6,7 +6,7 @@ import { PRODUCT, formatPrice } from '../shared/product.js';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const html = read('index.html'); const css = read('styles.css');
 test('static price slots agree with server config and Product schema', () => {
-  const slots = [...html.matchAll(/data-price="current"[^>]*>([^<]+)</g)]; assert.equal(slots.length, 5);
+  const slots = [...html.matchAll(/data-price="current"[^>]*>([^<]+)</g)]; assert.equal(slots.length, 4);
   for (const [, value] of slots) assert.equal(value, formatPrice(PRODUCT.price));
   const schema = JSON.parse(/<script type="application\/ld\+json">([^<]+)<\/script>/.exec(html)[1]);
   assert.equal(schema.offers.price, PRODUCT.price); assert.equal(schema.offers.priceCurrency, PRODUCT.currency);
@@ -75,9 +75,12 @@ test('footer is one centered wrapping composition on desktop and mobile', () => 
   assert.match(css, /\.footer__inner { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center;/);
   assert.doesNotMatch(css, /margin-inline-start: auto|footer-meta/);
 });
-test('compact header prices and desktop CTA use shared price slots', () => {
+test('desktop header has two section links and one CTA; mobile shared price slots remain', () => {
   const header = /<header class="header">([\s\S]*?)<\/header>/.exec(html)[1];
-  assert.match(header, /Замовити · <span data-price="current">800 грн<\/span>/);
+  assert.match(header, /Замовити <span aria-hidden="true">↗<\/span>/);
+  const nav = /<nav[^>]*>([\s\S]*?)<\/nav>/.exec(header)[1];
+  assert.deepEqual([...nav.matchAll(/<a href="([^"]+)">([^<]+)<\/a>/g)].map(([, href, text]) => [href, text]), [['#scenarios', 'Можливості'], ['#delivery', 'Доставка']]);
+  assert.match(header, /href="#order" data-cta-location="header"/);
   assert.match(header, /class="header-pricing"[\s\S]*?data-price="discount">−33%/);
   assert.match(css, /\.header-order { width: max-content; flex-shrink: 0; justify-content: center; gap: 6px; }/);
   assert.match(css, /\.hero__price \.saving { display: none; }/);

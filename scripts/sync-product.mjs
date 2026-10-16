@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { PRODUCT, SAVINGS, DISCOUNT, formatPrice } from '../shared/product.js';
 const root = new URL('../', import.meta.url);
 const path = new URL('index.html', root);
-const original = fs.readFileSync(path, 'utf8');
+const original = fs.readFileSync(path, 'utf8').replace(/\r\n/g, '\n');
 const values = { current: formatPrice(PRODUCT.price), reference: formatPrice(PRODUCT.referencePrice), savings: formatPrice(SAVINGS), discount: `−${DISCOUNT}%` };
 let html = original.replace(/(<(?:strong|del|span)[^>]*data-price="(current|reference|savings|discount)"[^>]*>)[^<]*(<\/(?:strong|del|span)>)/g, (_, open, key, close) => open + values[key] + close);
 const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1];
@@ -15,7 +15,7 @@ const schema = JSON.stringify({ '@context': 'https://schema.org', '@type': 'Prod
 html = html.replace(/<!-- product-schema:start -->[\s\S]*?<!-- product-schema:end -->/, `<!-- product-schema:start -->\n    <script type="application/ld+json">${schema}</script>\n    <!-- product-schema:end -->`);
 const hash = createHash('sha256').update(schema).digest('base64');
 const configPath = new URL('vercel.json', root);
-const configOriginal = fs.readFileSync(configPath, 'utf8');
+const configOriginal = fs.readFileSync(configPath, 'utf8').replace(/\r\n/g, '\n');
 const config = JSON.parse(configOriginal);
 const headers = config.headers.find(entry => entry.source === '/(.*)').headers;
 const csp = headers.find(header => header.key === 'Content-Security-Policy');

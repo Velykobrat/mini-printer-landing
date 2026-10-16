@@ -37,6 +37,11 @@ button, input { font: inherit; }
 .nav { display: flex; gap: 26px; font-size: var(--label-size); color: var(--muted); font-weight: 600; }
 .nav a { display: inline-flex; align-items: center; min-height: var(--touch-target); }
 .nav a:hover { color: var(--accent); }
+/* Keep desktop links and CTA together on the right. */
+@media (min-width: 681px) {
+  .header__inner { gap: 18px; }
+  .nav { margin-left: auto; align-items: center; gap: 18px; }
+}
 .button { min-height: 54px; padding: 0 28px; display: inline-flex; gap: 16px; align-items: center; justify-content: center; border: 0; border-radius: var(--pill); background: var(--accent); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 180ms ease, background 180ms ease; }
 .button:hover { background: var(--accent-dark); transform: translateY(-2px); }
 .button--small { min-height: var(--touch-target); padding-inline: 20px; font-size: var(--label-size); }
@@ -45,6 +50,32 @@ button, input { font: inherit; }
 .button--full { width: 100%; }
 .button:disabled { cursor: not-allowed; opacity: .65; transform: none; }
 .text-link { display: inline-flex; align-items: center; min-height: var(--touch-target); font-size: var(--label-size); font-weight: 700; }
+
+/* Sales content: existing surfaces and spacing, no promotional urgency. */
+.sales-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.sales-card { min-width: 0; padding: 26px; border: var(--border); border-radius: 24px; background: var(--surface); }
+.sales-card h3, .experience-card h3, .kit-note h3 { margin: 0 0 12px; font-size: 19px; line-height: 1.4; letter-spacing: -.035em; }
+.sales-card p, .sales-copy, .experience-card figcaption p, .kit-note p { margin: 0; color: var(--muted); line-height: 1.75; overflow-wrap: anywhere; }
+.sales-copy { margin-top: 22px; max-width: 440px; }
+.kit-note { margin-top: 24px; padding: 28px; border: var(--border); border-radius: 24px; background: var(--mint-surface); }
+.kit-note p + p { margin-top: 12px; }
+.experience-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.experience-card { min-width: 0; margin: 0; border: var(--border); border-radius: 24px; background: var(--surface); overflow: hidden; }
+.experience-card > img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.experience-card > img { height: auto; }
+.experience-card figcaption { padding: 24px; }
+.demo-section { background: var(--section-surface); }
+.demo-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 48px; }
+.demo-grid .section-heading { margin: 0; }
+@media (min-width: 1200px) {
+  .demo-grid .section-heading { align-self: start; }
+}
+.video-frame { min-width: 0; border: var(--border); border-radius: 28px; overflow: hidden; background: var(--surface); }
+.video-frame video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; max-height: 580px; object-fit: contain; background: #1b1c18; }
+.video-note { margin: 0; padding: 20px; color: var(--muted); line-height: 1.65; font-size: 14px; }
+.video-fallback img { width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; }
+.video-fallback > p { margin: 0; padding: 20px; color: var(--muted); line-height: 1.6; }
+.demo-notice { padding: 14px 18px; border: 1px solid var(--accent); border-radius: 14px; color: var(--accent); line-height: 1.6; }
 
 /* Hero */
 .hero { display: flex; align-items: center; padding: 64px 0 70px; }
@@ -67,37 +98,18 @@ button, input { font: inherit; }
 /* Benefits and use cases */
 .section { padding: var(--section-space) 0; }
 .section-heading { margin-bottom: 35px; }
-.section-heading h2, .details-grid h2 { margin: 0; font-size: clamp(28px, 3vw, 40px); line-height: 1.2; letter-spacing: -.04em; font-weight: 800; }
+.section-heading h2 { margin: 0; font-size: clamp(28px, 3vw, 40px); line-height: 1.2; letter-spacing: -.04em; font-weight: 800; }
 .section-heading h2 { max-width: 850px; }
-.section-heading--row { display: grid; grid-template-columns: 1.2fr .8fr; gap: 60px; align-items: end; }
-.section-copy { max-width: 460px; margin: 0; color: var(--muted); font-size: var(--body-size); line-height: 1.7; }
 .features-section, .details-section { background: var(--section-surface); }
 .features-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .feature { padding: 24px 22px; display: flex; flex-direction: column; background: var(--surface); border: var(--border); border-radius: 24px; }
 .feature-icon { display: block; flex-shrink: 0; width: 24px; height: 24px; margin-bottom: 16px; color: var(--accent); }
 .feature h3 { margin: 0 0 10px; font-size: 17px; line-height: 1.4; letter-spacing: -.045em; }
 .feature p { overflow-wrap: anywhere; margin: 0; color: var(--muted); font-size: var(--body-size); line-height: 1.65; }
-.scenarios { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
-.lifestyle { margin: 0; background: var(--surface); border: var(--border); border-radius: 26px; overflow: hidden; }
-.lifestyle img { width: 100%; height: 310px; object-fit: cover; }
-.lifestyle figcaption { padding: 24px; }
-.lifestyle h3 { margin: 0 0 8px; font-size: 19px; }
-.lifestyle p { font-size: var(--body-size); color: var(--muted); line-height: 1.8; margin: 0; }
-.scenario-list { display: grid; gap: 12px; }
-.scenario { display: flex; gap: 18px; padding: 20px 24px; border: var(--border); background: var(--surface); border-radius: 18px; }
-.scenario h3 { margin: 0; font-size: 16px; line-height: 1.5; }
-.scenario p { font-size: var(--body-size); line-height: 1.7; color: var(--muted); margin: 5px 0 0; }
-.scenario > span { color: var(--accent); background: #edf0ff; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 11px; flex-shrink: 0; }
 
 /* Delivery, specifications, FAQ */
-.details-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 65px; }
-.steps { margin: 30px 0 0; padding: 0; list-style: none; }
-.steps li { padding: 20px 0; display: grid; grid-template-columns: 35px 1fr; align-items: center; border-top: var(--border); }
-.steps li:last-child { border-bottom: var(--border); }
-.steps span { color: var(--accent); font-size: var(--label-size); }
-.steps p { margin: 0; font-weight: 600; font-size: var(--body-size); line-height: 1.7; }
 .specs { min-width: 0; background: var(--surface); border: var(--border); border-radius: 24px; padding: 28px; }
-.specs dl { margin: 0; }
+.specs dl { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 36px; }
 .specs dl div { padding: 15px 0; display: flex; justify-content: space-between; gap: 18px; border-bottom: var(--border); font-size: 14px; }
 .specs dl div:last-child { border: 0; }
 .specs dt { color: var(--muted); }
@@ -156,18 +168,23 @@ a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visibl
   .hero h1 { font-size: 46px; }
   .product-card { min-height: 420px; padding: 22px; }
   .features-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .nav { gap: 14px; }
-  .details-grid, .order-grid { gap: 30px; }
+  .order-grid { gap: 30px; }
   .order-grid { padding: 35px; }
   .order-copy h2 { font-size: 36px; }
-  .section-heading--row { grid-template-columns: 1fr; gap: 30px; }
 }
 /* The existing design stacks these sections on small tablets. */
 @media (max-width: 900px) {
-  .details-grid, .order-grid { grid-template-columns: minmax(0, 1fr); }
+  .order-grid { grid-template-columns: minmax(0, 1fr); }
+  .sales-grid { grid-template-columns: minmax(0, 1fr); }
+  .experience-grid { gap: 12px; }
+  .experience-card figcaption { padding: 18px; }
 }
 /* Mobile, including a 320px viewport and the onscreen keyboard. */
 @media (max-width: 680px) {
+  .experience-grid, .demo-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .experience-card > img { aspect-ratio: 4 / 3; }
+  .sales-card, .kit-note { padding: 22px; }
+  .demo-grid { gap: 28px; }
   html { --anchor-offset: 0px; }
   .header { position: static; top: auto; z-index: auto; }
   .container { width: calc(100% - 32px); }
@@ -181,28 +198,29 @@ a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visibl
   .logo { font-size: 15px; }
   .button--small { font-size: var(--label-size); padding-inline: 14px; }
   .hero { padding: 30px 0 48px; }
-  .hero__grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
-  .hero h1 { font-size: clamp(36px, 11vw, 43px); line-height: 1.08; letter-spacing: -.045em; }
-  .hero__description { margin-top: 18px; }
-  .hero__actions { gap: 18px; flex-wrap: wrap; }
-  .hero__actions .button { flex: 1 1 180px; padding-inline: 15px; }
-  .hero__price { gap: 12px; }
+  .hero__grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  /* One image in HTML; mobile grid places it between the description and price. */
+  .hero__content { display: contents; }
+  .hero h1 { grid-row: 1; font-size: clamp(36px, 11vw, 43px); line-height: 1.08; letter-spacing: -.045em; }
+  .hero__description { grid-row: 2; margin-top: 18px; }
+  .hero__visual { grid-row: 3; margin-top: 20px; }
+  .hero__price { grid-row: 4; margin-top: 20px; gap: 12px; }
+  .hero__actions { grid-row: 5; margin-top: 18px; gap: 8px; flex-direction: column; align-items: stretch; }
+  .hero__actions .button { flex: none; padding-inline: 15px; }
+  .hero__actions .text-link { justify-content: center; }
   .hero__price strong { font-size: 30px; }
-  .product-card { min-height: 330px; padding: 25px; }
-  .product-card img { max-height: 300px; }
+  .product-card { min-height: 0; padding: 20px; }
+  .product-card img { max-height: 280px; }
   .section { padding: 52px 0; }
   .section-heading { margin-bottom: 26px; }
-  .section-heading h2, .details-grid h2 { font-size: 29px; }
-  .section-heading--row { gap: 12px; }
+  .section-heading h2 { font-size: 29px; }
+  .demo-grid h2 { font-size: clamp(26px, 8vw, 29px); }
   .features-grid { gap: 12px; }
   .feature { padding: 20px 16px; }
   .feature h3 { font-size: 16px; }
   .feature p { font-size: 15px; }
-  .scenarios, .details-grid, .order-grid { grid-template-columns: minmax(0, 1fr); }
-  .lifestyle img { height: 280px; }
-  .scenario { padding: 19px; }
-  .details-grid { gap: 35px; }
   .specs { padding: 22px; }
+  .specs dl { grid-template-columns: minmax(0, 1fr); }
   .specs dd { max-width: 55%; }
   .order-section { padding: 12px 0 50px; }
   .order-grid { padding: 28px 20px; gap: 28px; border-radius: 26px; }

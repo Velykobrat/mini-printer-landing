@@ -1,5 +1,7 @@
 # Marketing Attribution & Conversion Funnel
 
+> Оновлено 16.10.2026: PR #8 і #9 уже злиті в main `1b6c3cf`. Нижче збережено історичний звіт відповідного етапу; згадки про незлитий PR, тодішнє середовище та кількість тестів належать тому етапу. Актуальний звіт релізу: [release-v2.1.0.md](release-v2.1.0.md); історія Sales Trust: [sales-trust.md](sales-trust.md). Production GA4/Telegram/WAF цим оновленням не перевірялися.
+
 ## Аудит після PR #8
 
 База: main `0cc73f0cbcf0791927da1e238fec890a90506905` (злитий PR #8).

@@ -1,3 +1,4 @@
+import { initReviews } from './sales.js';
 import { validateOrder } from './shared/validation.js';
 import { ANALYTICS } from './analytics-config.js';
 import { createAnalytics, createGoogleTag } from './analytics.js';
@@ -240,6 +241,7 @@ if (typeof document !== 'undefined') {
     initConsentUI({ consent });
     consent.start();
   } catch { /* Storage, DOM or Google failures must never prevent ordering. */ }
+  try { initReviews(); } catch { /* Optional sales content cannot interrupt ordering. */ }
   initOrderForm({ track });
   const syncOffset = initAnchorOffsets();
   initOrderNavigation({ syncOffset, track });

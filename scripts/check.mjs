@@ -11,6 +11,8 @@ for (const file of files(root).filter(file => /\.(?:js|mjs)$/.test(file))) {
 }
 const sync = spawnSync(process.execPath, [path.join(root, 'scripts/sync-product.mjs'), '--check'], { encoding: 'utf8' });
 assert.equal(sync.status, 0, sync.stderr);
+const sales = spawnSync(process.execPath, [path.join(root, 'scripts/sync-sales.mjs'), '--check'], { encoding: 'utf8' });
+assert.equal(sales.status, 0, sales.stderr);
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 assert.equal(new Set(ids).size, ids.length, 'Duplicate IDs');
@@ -28,7 +30,7 @@ assert.match(html, /<html lang="uk">/);
 assert.match(html, /id="order-form"[^>]+action="\/api\/order"/);
 assert.match(html, /<script type="module" src="\.\/script.js"><\/script>/);
 assert.match(html, /fetchpriority="high" width="630" height="630"/);
-assert.match(html, /loading="lazy"[^>]+width="630" height="630"/);
+assert.match(html, /<img\b(?=[^>]*loading="lazy")(?=[^>]*width="630")(?=[^>]*height="630")[^>]*>/);
 const css = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
 assert.equal((css.match(/{/g) || []).length, (css.match(/}/g) || []).length, 'Unbalanced CSS');
 assert.match(css, /prefers-reduced-motion: reduce/);

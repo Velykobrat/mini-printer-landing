@@ -67,6 +67,19 @@ test('Hero boundary buffer and delayed reveal prevent flicker and stale timers',
   passHero(ui); ui.settle(); assert.equal(ui.hidden(), false);
   ui.hero.rect = { top: 20, bottom: 74 }; ui.tick(); assert(ui.hidden());
 });
+
+test('375/390 mobile layouts require the CTA to pass the exit buffer, not just show features', () => {
+  for (const [width, bottom, expectedHidden] of [[375, -26.765625, false], [390, -14.421875, true]]) {
+    const ui = sticky(); ui.win.innerWidth = width;
+    // Browser scrollIntoViewIfNeeded(features) centers differently at each width.
+    ui.hero.rect = { top: bottom - 54, bottom }; ui.tick(); ui.settle();
+    assert.equal(ui.hidden(), expectedHidden, `exit buffer at ${width}px`);
+    ui.hero.rect = { top: -86, bottom: -32 }; ui.tick(); ui.settle();
+    assert.equal(ui.hidden(), false, `explicitly past the CTA at ${width}px`);
+    ui.hero.rect = { top: 300, bottom: 354 }; ui.tick();
+    assert(ui.hidden(), 'returning to the Hero hides the bar immediately');
+  }
+});
 test('sticky hides before the order section enters the viewport, then can return', () => {
   const ui = sticky(); passHero(ui); ui.settle(); assert.equal(ui.hidden(), false);
   ui.section.rect = { top: 900, bottom: 1600 }; ui.tick(); assert(ui.hidden());
