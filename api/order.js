@@ -75,9 +75,9 @@ export function createOrderHandler({ fetchImpl = globalThis.fetch, env = process
     if (!botToken || !chatId) return reply(503, 'Сервіс замовлень тимчасово недоступний.');
     const { name, phone } = validation.data;
     const text = [
-      '🖨 НОВЕ ЗАМОВЛЕННЯ — MINI PRINTER', '',
+      `🖨 НОВЕ ЗАМОВЛЕННЯ — ${PRODUCT.name.toLocaleUpperCase('uk-UA')}`, '',
       `👤 Ім’я: ${name}`, `📞 Телефон: ${phone}`, '',
-      `📦 ${PRODUCT.name}`, `💰 Ціна: ${PRODUCT.price} грн`, '',
+      `📦 ${PRODUCT.name}`, `💰 Ціна: ${PRODUCT.price} ${PRODUCT.currencyLabel}`, '',
       `🕒 ${new Date().toLocaleString('uk-UA', { timeZone: 'Europe/Kyiv' })}`,
     ].join('\n');
     const controller = new AbortController();

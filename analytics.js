@@ -11,11 +11,11 @@ export function createAnalytics({ enabled = false, hasConsent = () => false, sen
       let payload;
       let key;
       if (event === 'order_click') {
-        payload = { product: 'mini_printer', cta_location: ['header', 'hero', 'sticky_bar'].includes(details.cta_location) ? details.cta_location : 'other' };
+        payload = { product: PRODUCT.analyticsId, cta_location: ['header', 'hero', 'sticky_bar'].includes(details.cta_location) ? details.cta_location : 'other' };
       } else if (['view_item', 'begin_checkout', 'generate_lead'].includes(event)) {
         key = event === 'view_item' ? event : `${event}:${Number.isSafeInteger(details.attempt) ? details.attempt : 0}`;
         if (sent.has(key)) return false;
-        payload = { product: 'mini_printer', currency: PRODUCT.currency, value: PRODUCT.price };
+        payload = { product: PRODUCT.analyticsId, currency: PRODUCT.currency, value: PRODUCT.price };
         if (event !== 'generate_lead') payload.items = [{ item_id: PRODUCT.id, item_name: PRODUCT.name, price: PRODUCT.price, quantity: 1 }];
       } else return false;
       if (['order_click', 'begin_checkout', 'generate_lead'].includes(event)) {
@@ -52,7 +52,7 @@ export function createGoogleTag({ window: win = window, document: doc = document
     if (!pageViewed) {
       let campaign = {};
       try { campaign = campaignParameters(getAttribution()); } catch { /* Optional attribution cannot stop pageview. */ }
-      command('event', 'page_view', { page_location: config.pageLocation, page_title: 'Mini Printer', page_referrer: '', ...campaign });
+      command('event', 'page_view', { page_location: config.pageLocation, page_title: PRODUCT.name, page_referrer: '', ...campaign });
       pageViewed = true;
     }
     for (const [event, payload] of queue) command('event', event, payload);
@@ -79,7 +79,7 @@ export function createGoogleTag({ window: win = window, document: doc = document
       command('config', config.measurementId, { send_page_view: false,
         allow_google_signals: false, allow_ad_personalization_signals: false,
         cookie_expires: 15552000, cookie_update: false,
-        page_location: config.pageLocation, page_referrer: '', page_title: 'Mini Printer',
+        page_location: config.pageLocation, page_referrer: '', page_title: PRODUCT.name,
         // Do not let raw URL UTM values bypass validation. Consented events
         // supply approved campaign fields at the higher event scope instead.
         campaign_source: '', campaign_medium: '', campaign_name: '',

@@ -1,3 +1,11 @@
+## v2.3.0 — Product Configuration Foundation
+
+Товар налаштовується в `shared/product-config.js`. Це перший етап Product Landing Kit від BeBetter Development, а не повністю універсальний конструктор. Інструкція, обов'язкові поля та межі адаптації: [docs/product-configuration.md](docs/product-configuration.md).
+
+Після редагування запускайте `npm run sync:product`, `npm run sync:sales`, потім `npm test` і `npm run check`. Видимий контент залишається статичним HTML. `shared/product.js` і `shared/sales-content.js` тепер є сумісними експортами з конфігурації; старі інструкції редагувати ці файли напряму замінені цим правилом.
+
+Baseline — стабільний tag `v2.2.0`, commit `73008ebb61925edee4990a351fcb890b05cd2648`. Tag v2.3.0 не створюється до візуального приймання. Окремий manual deploy не виконується; після дозволеного push працює наявна Git integration Vercel.
+
 # Mini Printer v2.2.0 — Premium Experience
 
 Україномовний лендінг портативного термопринтера. Збережено візуальний напрям Pocket Studio, HTML/CSS/vanilla JavaScript і Vercel Node.js Function із Telegram Bot API. Немає frontend-фреймворку, бази даних, сторонніх npm-залежностей або обов’язкового build-кроку.

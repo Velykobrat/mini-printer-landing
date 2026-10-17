@@ -1,5 +1,6 @@
 import { initReviews } from './sales.js';
 import { validateOrder } from './shared/validation.js';
+import { PRODUCT_CONFIG } from './shared/product-config.js';
 import { ANALYTICS } from './analytics-config.js';
 import { createAnalytics, createGoogleTag } from './analytics.js';
 import { createConsent, initConsentUI } from './consent.js';
@@ -18,7 +19,7 @@ export function initOrderForm({ document: doc = document, fetchImpl = globalThis
   const beginAttempt = () => {
     if (!attemptStarted) { attemptStarted = true; safeTrack('begin_checkout'); }
   };
-  const idleLabel = 'Надіслати заявку';
+  const idleLabel = PRODUCT_CONFIG.cta.submit;
   let inFlight = false;
   let lastAccepted = null; // Tab-local duplicate guard, not distributed idempotency.
   form.noValidate = true; // Native constraints still work when JavaScript is unavailable.
@@ -65,7 +66,7 @@ export function initOrderForm({ document: doc = document, fetchImpl = globalThis
     }
     inFlight = true;
     button.disabled = true;
-    button.textContent = 'Надсилаємо заявку…';
+    button.textContent = PRODUCT_CONFIG.cta.loading;
     form.setAttribute('aria-busy', 'true');
     for (const field of Object.values(fields)) field.readOnly = true;
     setStatus('Передаємо заявку…');
