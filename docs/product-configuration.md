@@ -1,5 +1,7 @@
 # Product Configuration Foundation — v2.3.0
 
+Оновлення v2.4: `PRODUCT_CONFIG.sections` керує видимістю/порядком; обидві sync-команди виконують спільну повну збірку з canonical template. Актуальні залежності, модулі й QA: [reusable-sections.md](reusable-sections.md). Нижче збережено foundation-контракт v2.3.
+
 Єдине джерело продуктових даних: **shared/product-config.js**. Конфігурація перевіряється під час імпорту через shared/product-config-validation.js і рекурсивно заморожується. Немає CMS, template engine, build framework, сховища чи нових npm-залежностей. Це foundation, а не підтверджено універсальний Product Landing Kit.
 
 ## Структура та обов’язкові дані

@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.4.0 — Reusable Sections (17.10.2026; візуальна перевірка очікується)
+
+- Декларативні enabled/order для Hero, Features, Scenarios, Video, Specifications, Delivery/Kit, FAQ та Order; строгий whitelist і перевірка унікальності.
+- Вісім незалежних renderer-модулів, канонічний HTML-шаблон і спільна детермінована збірка для обох sync-команд. Попередні content-render APIs лишаються сумісними фасадами.
+- Без Order немає form/CTA/sticky; без Scenarios немає відповідних посилань; без Hero — доступний fallback H1 і відсутній Hero-dependent sticky bar. Default DOM/контент збережено (очищено лише пробіли на семи порожніх рядках HTML); одна нова CSS utility не змінює стандартний вигляд.
+- Усі 163 попередні тести збережено; 23 нові перевіряють конфігурацію, 256 visibility-комбінацій, порядок, залежності, XSS, доступність, repeatability та CLI/check/restore.
+- 186 тестів, check і diff whitespace проходять. Browser QA заблоковано середовищем: ERR_NETWORK_ACCESS_DENIED до першого сценарію, без обходу обмежень.
+- API/Telegram, GA4/UTM/consent, runtime JS, ціни, контент, фото/відео, CSP та production services незмінні. Не додано theme system, CMS, database, залежності, новий demo mode чи тестову адаптацію іншого товару.
+
+
 ## 2.3.0 — Product Configuration Foundation (17.10.2026; візуальне приймання очікується)
 
 - Централізована валідована immutable product configuration: ідентичність, ціни, переваги, характеристики, медіа, комерційні статуси, сценарії, FAQ, CTA та SEO.

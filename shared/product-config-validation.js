@@ -1,3 +1,4 @@
+import { validateSections } from './section-config.js';
 const fail = path => { throw new Error(`Invalid product configuration: ${path}`); };
 const text = (value, path) => { if (typeof value !== 'string' || !value.trim() || value.length > 4000 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value)) fail(path); };
 const object = (value, path) => { if (!value || typeof value !== 'object' || Array.isArray(value)) fail(path); };
@@ -10,6 +11,7 @@ export function validateMediaPath(value, type = 'image') {
 }
 export function validateProductConfig(c) {
   object(c, 'root');
+  validateSections(c.sections);
   if (!['demo', 'sales'].includes(c.mode)) fail('mode');
   for (const key of ['product', 'pricing', 'media', 'commerce', 'cta', 'copy', 'seo']) object(c[key], key);
   for (const key of ['id', 'analyticsId', 'name', 'shortDescription', 'description']) text(c.product[key], `product.${key}`);

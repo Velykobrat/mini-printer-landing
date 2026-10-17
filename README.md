@@ -1,3 +1,11 @@
+## v2.4.0 — Reusable Sections
+
+Порядок і видимість восьми секцій налаштовуються через `PRODUCT_CONFIG.sections` (`id`, `enabled`, `order`). Інструкція та залежності: [docs/reusable-sections.md](docs/reusable-sections.md).
+
+Обидві команди `sync:product` і `sync:sales` тепер збирають усю сторінку з канонічного `templates/page.html` та незалежних модулів `scripts/sections/`. За замовчуванням DOM і контент збігаються з v2.3; очищено лише пробіли на семи порожніх рядках HTML. Вимкнені Order/Scenarios прибирають залежні CTA/посилання; без Hero sticky bar не генерується, додається доступний невидимий H1. API, Telegram, GA4, UTM і комерційні умови не змінюються.
+
+186 тестів і статичні перевірки проходять. Browser QA спробовано, але Chromium отримав `ERR_NETWORK_ACCESS_DENIED` на localhost; візуальний QA не підтверджено. Нових залежностей, тем, demo-order flow, адаптації іншого товару або release tag не додано.
+
 ## v2.3.0 — Product Configuration Foundation
 
 Товар налаштовується в `shared/product-config.js`. Це перший етап Product Landing Kit від BeBetter Development, а не повністю універсальний конструктор. Інструкція, обов'язкові поля та межі адаптації: [docs/product-configuration.md](docs/product-configuration.md).

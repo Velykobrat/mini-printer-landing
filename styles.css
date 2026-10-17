@@ -300,3 +300,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visibl
 .privacy h2 { font-size: 22px; margin-block: 24px 12px; }
 .privacy p { line-height: 1.7; margin-block: 12px; }
 @media (min-width: 768px) { .consent { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; } .consent__actions { margin: 0; } }
+
+/* Accessible page title when the optional Hero section is disabled. */
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }

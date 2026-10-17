@@ -1,7 +1,9 @@
 import { validateProductConfig, deepFreeze } from './product-config-validation.js';
+import { DEFAULT_SECTIONS } from './section-config.js';
 
 // Approved facts only. Demo is a configuration marker, not an order-flow switch.
 export const PRODUCT_CONFIG = deepFreeze(validateProductConfig({
+  sections: DEFAULT_SECTIONS,
   "mode": "sales",
   "product": {
     "id": "mini-printer",

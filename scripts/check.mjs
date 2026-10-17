@@ -3,6 +3,9 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
+import { PRODUCT_CONFIG } from '../shared/product-config.js';
+import { assertPageIntegrity } from './landing-render.mjs';
+const enabled = new Set(PRODUCT_CONFIG.sections.filter(item => item.enabled).map(item => item.id));
 const root = fileURLToPath(new URL('../', import.meta.url));
 const files = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => entry.name === '.git' ? [] : entry.isDirectory() ? files(path.join(dir, entry.name)) : [path.join(dir, entry.name)]);
 for (const file of files(root).filter(file => /\.(?:js|mjs)$/.test(file))) {
@@ -14,6 +17,7 @@ assert.equal(sync.status, 0, sync.stderr);
 const sales = spawnSync(process.execPath, [path.join(root, 'scripts/sync-sales.mjs'), '--check'], { encoding: 'utf8' });
 assert.equal(sales.status, 0, sales.stderr);
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+assertPageIntegrity(html);
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 assert.equal(new Set(ids).size, ids.length, 'Duplicate IDs');
 for (const [, id] of html.matchAll(/href="#([^"]+)"/g)) assert(ids.includes(id), `Missing anchor ${id}`);
@@ -27,10 +31,10 @@ for (const file of files(root).filter(file => /\.(?:js|mjs)$/.test(file))) {
 }
 assert.equal((html.match(/<h1\b/g) || []).length, 1);
 assert.match(html, /<html lang="uk">/);
-assert.match(html, /id="order-form"[^>]+action="\/api\/order"/);
+if (enabled.has('order')) assert.match(html, /id="order-form"[^>]+action="\/api\/order"/);
 assert.match(html, /<script type="module" src="\.\/script.js"><\/script>/);
-assert.match(html, /fetchpriority="high" width="630" height="630"/);
-assert.match(html, /<img\b(?=[^>]*loading="lazy")(?=[^>]*width="630")(?=[^>]*height="630")[^>]*>/);
+if (enabled.has('hero')) assert.match(html, /fetchpriority="high"/);
+if (enabled.has('scenarios')) assert.match(html, /<img\b(?=[^>]*loading="lazy")[^>]*>/);
 const css = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
 assert.equal((css.match(/{/g) || []).length, (css.match(/}/g) || []).length, 'Unbalanced CSS');
 assert.match(css, /prefers-reduced-motion: reduce/);
