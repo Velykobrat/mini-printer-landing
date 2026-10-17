@@ -3,12 +3,11 @@ node_modules/
 
 # Build / deployment
 dist/
-.vercel/
+.vercel
 .netlify/
 
 # Environment
-.env
-.env.*
+.env*
 !.env.example
 
 # Logs
@@ -24,5 +23,3 @@ dist/
 .DS_Store
 Thumbs.db
 desktop.ini
-.vercel
-.env*

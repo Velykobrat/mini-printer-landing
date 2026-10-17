@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.5.0 — Finalization (17.10.2026; tag/Release очікують приймання)
+
+- Фінальний технічний аудит, професійний README, architecture/deployment/maintenance/release/portfolio документація; історичні QA/release/Sales Trust reports і старий README збережені в docs/archive з узгодженими посиланнями.
+- Усунуто дублікати .gitignore та зайвий order DOM lookup; дизайн, commercial content, mode: sales, API, Telegram, GA4/UTM, CSP і ціни незмінні.
+- Всі 222 попередні тести збережено; додано 3 регресійні перевірки internal docs links, новий check:docs. Фінальні результати й обмеження — [release report](docs/release-v2.5.0.md).
+- Active WAF не підтверджено: read-only Vercel workspace access повернув 403, CLI відсутній. Commercial readiness потребує зовнішньої перевірки; без реальних Telegram заявок або production settings changes.
+- Релізний Git commit публікується через чинну Vercel Git integration. Tag v2.5.0 і GitHub Release тільки після окремого приймання commit/deployment, без manual deploy.
+
 ## 2.5.0 — Design Themes (17.10.2026; візуальне приймання очікується)
 
 - Незалежна developer theme selection, єдина тема pocket-studio, закрита схема токенів, валідація кольорів/розмірів/типографіки та захист від CSS injection.
@@ -35,10 +43,10 @@
 - Узгоджені деталі H3, внутрішніх відступів карток і текстових посилань.
 - Native FAQ із коротким fade відповіді; чотири одноразові reveal заголовків, reduced motion та безпечний fallback без JS/IntersectionObserver/motion-модуля.
 - Регресійні unit і браузерні перевірки; без змін Hero, контенту, медіа, sticky-логіки, комерційних даних та інтеграцій.
-- Затверджено користувачем до публікації. Детальний QA — [release-v2.2.0.md](docs/release-v2.2.0.md).
+- Затверджено користувачем до публікації. Детальний QA — [release-v2.2.0.md](docs/archive/release-v2.2.0.md).
 
 ## 2.1.0 — Sales Experience
 
 - Покращені mobile Hero, Header, сценарії використання, відеосекція, доставка/комплектація, п’ять FAQ та безпечні режими відгуків.
 - База Premium Experience: `94b521242b32841b5a81cb72b0f4d026f51ddc18`.
-- Історичний звіт — [release-v2.1.0.md](docs/release-v2.1.0.md).
+- Історичний звіт — [release-v2.1.0.md](docs/archive/release-v2.1.0.md).

@@ -9,9 +9,12 @@
     "check": "node scripts/check.mjs",
     "sync:product": "node scripts/sync-product.mjs",
     "sync:sales": "node scripts/sync-sales.mjs",
-    "qa:browser": "node scripts/browser-qa.mjs"
+    "qa:browser": "node scripts/browser-qa.mjs",
+    "check:docs": "node scripts/check-links.mjs"
   },
   "engines": {
     "node": "22.x"
-  }
+  },
+  "description": "Configurable product landing with static sections, design tokens and a Telegram order endpoint",
+  "license": "MIT"
 }

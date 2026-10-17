@@ -1,6 +1,6 @@
 # GA4 integration and verification
 
-> Оновлено 16.10.2026: PR #8 і #9 уже злиті в main `1b6c3cf`. Нижче збережено історичний звіт відповідного етапу; згадки про незлитий PR, тодішнє середовище та кількість тестів належать тому етапу. Актуальний звіт релізу: [release-v2.1.0.md](release-v2.1.0.md); історія Sales Trust: [sales-trust.md](sales-trust.md). Production GA4/Telegram/WAF цим оновленням не перевірялися.
+> Актуальний стан: v2.5.0. Інструкції нижче збережено; історичні кількості тестів і проміжні результати не є QA фінального commit. Фінальна перевірка: [release-v2.5.0.md](release-v2.5.0.md).
 
 Оновлення після PR #8: [Marketing Attribution & Conversion Funnel](marketing-attribution.md) описує consent-gated sessionStorage, безпечний UTM-контракт, native campaign_* на існуючих подіях і налаштування воронки. Нижче — базова реалізація PR #8; її 112 тестів входять до розширеного suite (129 тестів для attribution PR).
 

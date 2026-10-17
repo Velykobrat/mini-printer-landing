@@ -164,11 +164,10 @@ export function initStickyOrder({ document: doc = document, window: win = window
   const bar = doc.querySelector('.mobile-order');
   const hero = doc.querySelector('.hero__actions a[href="#order"]');
   const section = doc.getElementById('order');
-  const target = doc.getElementById('order');
   if (!bar) return;
   bar.classList.toggle('is-hidden', true); // Also hidden in HTML: no first-paint duplicate.
   // Fail closed if visibility cannot be determined; Hero/header CTAs still work.
-  if (!hero || !section || !target || !('IntersectionObserver' in win)) return;
+  if (!hero || !section || !('IntersectionObserver' in win)) return;
   const mobile = win.matchMedia?.('(max-width: 680px)');
   const delay = win.setTimeout?.bind(win) ?? setTimeout;
   const cancelDelay = win.clearTimeout?.bind(win) ?? clearTimeout;
@@ -196,7 +195,7 @@ export function initStickyOrder({ document: doc = document, window: win = window
   };
   const hide = () => {
     if (showTimer !== null) { cancelDelay(showTimer); showTimer = null; }
-    if (bar.contains(doc.activeElement)) target.focus({ preventScroll: true });
+    if (bar.contains(doc.activeElement)) section.focus({ preventScroll: true });
     bar.classList.toggle('is-hidden', true);
   };
   const update = () => {

@@ -1,5 +1,7 @@
 # Security review and deployment checklist
 
+Final v2.5.0 review: [release-v2.5.0.md](release-v2.5.0.md). On 17.10.2026 the read-only Vercel project query returned 403 for the intended workspace; no Vercel CLI is available. Active WAF enforcement could not be inspected. This is an external verification requirement, not evidence that the rule is active or absent. No production settings were changed.
+
 ## Implemented in code
 
 - POST only (`405`, `Allow: POST`), JSON only (`415`), invalid payload (`400`), oversized payload (`413`). All API replies use `no-store`.
