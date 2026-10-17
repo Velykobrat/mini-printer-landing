@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.5.0 — Design Themes (17.10.2026; візуальне приймання очікується)
+
+- Незалежна developer theme selection, єдина тема pocket-studio, закрита схема токенів, валідація кольорів/розмірів/типографіки та захист від CSS injection.
+- Статична детермінована генерація styles.css, контроль drift і синхронізація meta theme-color через наявні sync-команди. Fonts/CSP і клієнтський runtime незмінні.
+- Конфігуровані палітра/стани, базова й responsive typography, радіуси кнопок/карток, секційні відступи, gutters і ширина контенту. Layout/breakpoints/motion лишаються у CSS.
+- 186 попередніх тестів без змін + 36 нових; повна статична еквівалентність CSS v2.4 після підстановки токенів. HTML/контент/медіа, API/Telegram, GA4/UTM/consent, SEO/JSON-LD збережено.
+- Browser QA спробовано: ERR_CONNECTION_TIMED_OUT на localhost до першого сценарію; візуальна перевірка не підтверджена. Нових залежностей, додаткових тем, manual deploy або tag немає.
+
 ## 2.4.0 — Reusable Sections (17.10.2026; візуальна перевірка очікується)
 
 - Декларативні enabled/order для Hero, Features, Scenarios, Video, Specifications, Delivery/Kit, FAQ та Order; строгий whitelist і перевірка унікальності.

@@ -1,3 +1,9 @@
+## v2.5.0 — Design Themes
+
+Незалежний вибір теми в `shared/design-config.js`, строгий реєстр токенів і статична генерація `styles.css` з `templates/styles.css`. Єдина тема `pocket-studio` відтворює чинний дизайн. Інструкція: [docs/design-themes.md](docs/design-themes.md). Після редагування теми запускайте sync:product або sync:sales, потім тести/check.
+
+222 тести (186 попередніх + 36 нових). Статична еквівалентність CSS підтверджена; browser QA не пройдено через ERR_CONNECTION_TIMED_OUT на localhost, візуальне приймання очікується. HTML/контент, API/Telegram, GA4/UTM/consent і CSP збережені. Додаткових тем, залежностей, visitor switcher і release tag немає.
+
 ## v2.4.0 — Reusable Sections
 
 Порядок і видимість восьми секцій налаштовуються через `PRODUCT_CONFIG.sections` (`id`, `enabled`, `order`). Інструкція та залежності: [docs/reusable-sections.md](docs/reusable-sections.md).
